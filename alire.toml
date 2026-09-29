@@ -1,0 +1,11 @@
+name = "beacon"
+description = "Typed publish-subscribe messaging: generic topics, protected queues"
+version = "0.1.0-dev"
+authors = ["Olivier Henley"]
+maintainers = ["Olivier Henley <henley@adacore.com>"]
+maintainers-logins = ["ohenley"]
+licenses = "Apache-2.0"
+website = "https://github.com/GNAT-Academic-Program/beacon"
+tags = ["pubsub", "messaging", "dds", "embedded", "spark", "gap"]
+
+project-files = ["beacon.gpr"]

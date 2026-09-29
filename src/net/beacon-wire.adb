@@ -1,0 +1,116 @@
+package body Beacon.Wire is
+
+   use type Interfaces.Unsigned_16;
+
+   --  Header has Scalar_Storage_Order High_Order_First and is overlaid
+   --  on a Byte_Array (which has none); that is the intent, the warning
+   --  is about exactly the conversion we want.
+   pragma Warnings (Off, "overlay changes scalar storage order");
+
+   --  CRC-32 (IEEE 802.3, reflected), table-free. The Week 13 decision
+   --  is made: this is the scheme. Same polynomial as zlib and PNG.
+   function Checksum (Data : Byte_Array) return Checksum_Type is
+      Poly : constant Checksum_Type := 16#EDB88320#;
+      C    : Checksum_Type := 16#FFFFFFFF#;
+   begin
+      for B of Data loop
+         C := C xor Checksum_Type (B);
+         for Bit in 1 .. 8 loop
+            if (C and 1) = 1 then
+               C := (C / 2) xor Poly;
+            else
+               C := C / 2;
+            end if;
+         end loop;
+      end loop;
+      return C xor 16#FFFFFFFF#;
+   end Checksum;
+
+   ------------
+   -- Encode --
+   ------------
+
+   procedure Encode
+     (Topic    : Topic_Id_Type;
+      Sequence : Sequence_Type;
+      Payload  : Byte_Array;
+      Frame    : out Byte_Array;
+      Last     : out Natural)
+   is
+      First : constant Positive := Frame'First;
+      --  The overlay is THE way to write the header. Do not byte-pack.
+      H : Header with Import, Address => Frame (First)'Address;
+   begin
+      Frame := [others => 0];
+      Last  := First + Header_Length + Payload'Length - 1;
+      H := (Magic    => Magic_Value,
+            Topic    => Topic,
+            Sequence => Sequence,
+            Length   => Payload'Length,
+            Checksum => 0);
+      Frame (First + Header_Length .. Last) := Payload;
+      H.Checksum := Checksum (Frame (First .. Last));
+   end Encode;
+
+   ------------
+   -- Decode --
+   ------------
+
+   procedure Decode
+     (Frame        : Byte_Array;
+      Topic        : out Topic_Id_Type;
+      Sequence     : out Sequence_Type;
+      Payload      : out Byte_Array;
+      Payload_Last : out Natural;
+      Status       : out Decode_Status)
+   is
+      First : constant Positive := Frame'First;
+   begin
+      Topic        := 0;
+      Sequence     := 0;
+      Payload      := [others => 0];
+      Payload_Last := Payload'First - 1;
+
+      if Frame'Length < Header_Length then
+         Status := Too_Short;
+         return;
+      end if;
+
+      declare
+         H : Header with Import, Address => Frame (First)'Address;
+      begin
+         if not H.Magic'Valid or else H.Magic /= Magic_Value then
+            Status := Bad_Magic;
+            return;
+         end if;
+         if not H.Length'Valid
+           or else Header_Length + Natural (H.Length) /= Frame'Length
+         then
+            Status := Bad_Length;
+            return;
+         end if;
+
+         --  Recompute with the checksum field zeroed, on a copy: Frame
+         --  is an in parameter and must not be modified.
+         declare
+            Copy : Byte_Array (1 .. Frame'Length) := Frame;
+            HC   : Header with Import, Address => Copy (1)'Address;
+            Sent : constant Checksum_Type := HC.Checksum;
+         begin
+            HC.Checksum := 0;
+            if Checksum (Copy) /= Sent then
+               Status := Bad_Checksum;
+               return;
+            end if;
+         end;
+
+         Topic    := H.Topic;
+         Sequence := H.Sequence;
+         Payload_Last := Payload'First + Natural (H.Length) - 1;
+         Payload (Payload'First .. Payload_Last) :=
+           Frame (First + Header_Length .. Frame'Last);
+         Status := Ok;
+      end;
+   end Decode;
+
+end Beacon.Wire;
