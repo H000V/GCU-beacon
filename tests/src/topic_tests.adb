@@ -3,8 +3,9 @@
 --  capacity and verify the documented behavior actually occurs.
 
 with Ada.Command_Line;
-with Ada.Text_IO;  use Ada.Text_IO;
-with Beacon;       use Beacon;
+with Ada.Real_Time;  use Ada.Real_Time;
+with Ada.Text_IO;    use Ada.Text_IO;
+with Beacon;         use Beacon;
 with Beacon.Topic;
 
 procedure Topic_Tests is
@@ -80,6 +81,23 @@ begin
    end loop;
    T.Try_Receive (Rel, Msg, Got);
    Check (not Got, "reliable drained, Try_Receive says empty");
+
+   --  Timed Receive tests (Task 2.1)
+   T.Receive (Rel, Msg, Time_Span_Zero, Got);
+   Check (not Got, "timed receive: empty queue with zero timeout returns False");
+
+   T.Receive (Rel, Msg, Milliseconds (10), Got);
+   Check (not Got, "timed receive: empty queue with 10ms timeout returns False");
+
+   T.Publish (Pub, (Id => 101, Value => 42.0));
+   T.Receive (Rel, Msg, Time_Span_Zero, Got);
+   Check (Got and then Msg.Id = 101,
+          "timed receive: item ready with zero timeout returns True");
+
+   T.Publish (Pub, (Id => 102, Value => 84.0));
+   T.Receive (Rel, Msg, Milliseconds (50), Got);
+   Check (Got and then Msg.Id = 102,
+          "timed receive: item ready with positive timeout returns True");
 
    --  TODO (weeks 5-8): blocking Publish on a full Reliable queue, from a
    --  separate task, verified to unblock when the subscriber drains.
