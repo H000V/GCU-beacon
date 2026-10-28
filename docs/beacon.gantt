@@ -1,0 +1,102 @@
+gantt
+    title Beacon: Typed Publish-Subscribe Messaging (Actual Progress as of 10/18)
+    dateFormat  YYYY-MM-DD
+    axisFormat  %b %d
+    tickInterval 1week
+
+    %% =========================================================================
+    %% FALL 2026: ENVIRONMENT, IN-PROCESS CORE & TRANSPORTS (Sep 07 - Dec 20, 2026)
+    %% =========================================================================
+
+    section P1: Environment & Design (Sep 07 - Oct 18)
+    Toolchain Setup & Build Verification          :done, p1_1, 2026-09-28, 2026-10-04
+    Audit Seed Repository                          :done, p1_2, 2026-09-28, 2026-10-11
+    Resolve Open Design Decisions                  :done, p1_3, 2026-10-05, 2026-10-18
+    Current Date (October 18, 2026)                :milestone, today, 2026-10-18, 0d
+
+    section P2: Timed Receive & Presentation (Oct 19 - Nov 01)
+    Implement Timed Receive in Topic Body          :active, p2_1, 2026-10-19, 7d
+    Timed Receive Unit Tests & Timeout Checks      :active, p2_2, 2026-10-19, 7d
+    Milestone 1 - Design Review Presentation 1     :milestone, m1, 2026-10-22, 0d
+    Harden Protected Queue Entry Barriers          :p2_3, 2026-10-26, 7d
+    Implement Multi-Task Blocking-Publish Test     :p2_4, 2026-10-26, 7d
+
+    section P3: In-Process Soak & Demo Release (Nov 02 - Nov 22)
+    Verify Best-Effort Drop-Oldest                 :p3_1, 2026-11-02, 7d
+    Drop-Oldest Invariant & Property Tests         :p3_2, 2026-11-02, 7d
+    Multi-Task Sustained Soak Stress Test          :p3_3, 2026-11-09, 7d
+    Zero-Heap & Embedded Jorvik Audit              :p3_4, 2026-11-09, 7d
+    Expand Flight Telemetry Demo                   :p3_5, 2026-11-16, 7d
+    Tag In-Process Release v0.1.0-inproc           :p3_6, 2026-11-16, 7d
+    Milestone 2 - In-Process Backend Demo          :milestone, m2, 2026-11-22, 0d
+
+    section P4: Wire Protocol & UDP Prototype (Nov 23 - Dec 13)
+    Wire Header Representation Clauses Layout      :p4_1, 2026-11-23, 7d
+    Wire Framing & CRC-32 Unit Test Suite          :p4_2, 2026-11-23, 7d
+    GNAT.Sockets UDP Multicast Transport Tuning    :p4_3, 2026-11-30, 7d
+    Bridge Egress & Ingress Task Integration       :p4_4, 2026-11-30, 7d
+    Implement Cross-Process UDP Publish-Receive    :p4_5, 2026-12-07, 7d
+    Headless Cross-Process CI Verification Test    :p4_6, 2026-12-07, 7d
+    Milestone 3 - Cross-Process UDP Demo           :milestone, m3, 2026-12-13, 0d
+
+    section P5: Serial Transport & Fall Finish (Dec 14 - Dec 20)
+    Serial Transport Architecture & Stream Framing :p5_1, 2026-12-14, 7d
+    Serial Virtual Port Loopback & Recovery Tests  :p5_2, 2026-12-14, 7d
+    Milestone 4 - Design Review Presentation 2     :milestone, m4, 2026-12-18, 0d
+
+    %% =========================================================================
+    %% WINTER BREAK: DECEMBER 20, 2026 - JANUARY 4, 2027 (RECESS)
+    %% =========================================================================
+
+    %% =========================================================================
+    %% SPRING PRE-BREAK SPRINT: DISTRIBUTED DEMO & PROOF (Jan 04 - Mar 14, 2027)
+    %% =========================================================================
+
+    section P5: Distributed Demo & Hardening (Jan 04 - Jan 31)
+    W14 Multi-Publisher Sequence Gap Tracking Bridge   :w14_1, 2027-01-04, 7d
+    W14 Sensor Nodes 1 and 2 Distributed Setup        :w14_2, 2027-01-04, 7d
+    W15 Telemetry & Ground Station Live Dashboard      :w15_1, 2027-01-11, 7d
+    W15 Cross-Process Sequence Gap & Loss Display      :w15_2, 2027-01-11, 7d
+    W16 Cross-Platform Builds Linux and Windows        :w16_1, 2027-01-18, 7d
+    W16 Multi-Transport Dynamic Switch UDP and Serial  :w16_2, 2027-01-18, 7d
+    W17 Sustained Multi-Node Distributed Soak Test     :w17_1, 2027-01-25, 7d
+    Milestone 5 - Full Distributed System Signoff      :milestone, m5, 2027-01-31, 0d
+
+    section P6: SPARK Formal Proof & Dev Finish (Feb 01 - Mar 14)
+    W18 SPARK Annotations & Relaxed_Initialization     :w18_1, 2027-02-01, 7d
+    W18 Formal Contracts on Push, Pop, and Ring Index  :w18_2, 2027-02-01, 7d
+    W19 GNATprove Silver Proof Index & Bounds Safety   :w19_1, 2027-02-08, 7d
+    W19 Automated SPARK Proof CI Workflow Setup        :w19_2, 2027-02-08, 7d
+    W20 GNATprove Proof of Drop-Oldest Preservation    :w20_1, 2027-02-15, 7d
+    W20 Discharge 100% Silver Verification Conditions  :w20_2, 2027-02-15, 7d
+    W21 Node Failover & Network Reconnect Hardening    :w21_1, 2027-02-22, 7d
+    W21 Pre-Release Memory & Zero-Leak Profiling       :w21_2, 2027-02-22, 7d
+    W22 Comprehensive Bug Squashing & Interface Polish :w22_1, 2027-03-01, 7d
+    W23 Full System Integration & Feature Freeze Demo  :w23_1, 2027-03-08, 7d
+    Milestone 6 - Pre-Spring Break Code Freeze Signoff :milestone, m6, 2027-03-14, 0d
+
+    %% =========================================================================
+    %% SPRING BREAK: MARCH 15 - MARCH 21, 2027 (CODE FREEZE)
+    %% =========================================================================
+
+    %% =========================================================================
+    %% POST-SPRING BREAK: TESTING, PACKAGING & DEFENSE (Mar 22 - Apr 12, 2027)
+    %% =========================================================================
+
+    section P7: Benchmarking & Loss Profiling (Mar 22 - Mar 28)
+    W24 Microbenchmark Suite Latency & Jitter          :w24_1, 2027-03-22, 7d
+    W24 Real Physical LAN Multicast Loss Profiling     :w24_2, 2027-03-22, 7d
+    W24 Protected Queue Lock Contention Analysis       :w24_3, 2027-03-22, 7d
+
+    section P8: Packaging & DDS Comparative Paper (Mar 29 - Apr 04)
+    W25 Alire Manifest adacore_beacon Packaging        :w25_1, 2027-03-29, 7d
+    W25 Clean-Room Standalone Crate Verification       :w25_2, 2027-03-29, 7d
+    W25 Complete DDS vs Beacon Comparative Whitepaper  :w25_3, 2027-03-29, 7d
+    W25 Comprehensive API Reference & Quickstart Guide :w25_4, 2027-03-29, 7d
+    Milestone 7 - Packaging & Whitepaper Signoff       :milestone, m7, 2027-04-04, 0d
+
+    section P9: Final Defense & Alire Publish (Apr 05 - Apr 12)
+    W26 Multi-Laptop Live Demonstration Rehearsal      :w26_1, 2027-04-05, 7d
+    W26 Submit adacore_beacon to Alire Community Index :w26_2, 2027-04-05, 7d
+    W26 Finalize Capstone Defense Slides & Poster      :w26_3, 2027-04-05, 7d
+    Milestone 8 - Senior Capstone Final Defense        :milestone, m8, 2027-04-12, 0d
