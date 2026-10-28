@@ -1,3 +1,5 @@
+with Ada.Real_Time; use Ada.Real_Time;
+
 package body Beacon.Topic is
 
    -------------------
@@ -121,6 +123,25 @@ package body Beacon.Topic is
    procedure Receive (S : in out Subscriber; Msg : out Message_Type) is
    begin
       S.Queue.Pop (Msg);
+   end Receive;
+
+   procedure Receive
+     (S       : in out Subscriber;
+      Msg     : out Message_Type;
+      Timeout : Ada.Real_Time.Time_Span;
+      Success : out Boolean) is
+   begin
+      if Timeout <= Time_Span_Zero then
+         S.Queue.Try_Pop (Msg, Success);
+      else
+         select
+            S.Queue.Pop (Msg);
+            Success := True;
+         or
+            delay until Clock + Timeout;
+            Success := False;
+         end select;
+      end if;
    end Receive;
 
    procedure Try_Receive

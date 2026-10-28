@@ -16,6 +16,7 @@
 --  Runtime needs: protected types with entries, so light-tasking
 --  (Ravenscar / Jorvik) or full. Not ZFP. On ZFP use Beacon.Queue directly.
 
+with Ada.Real_Time;
 with Beacon.Queue;
 
 generic
@@ -73,6 +74,15 @@ package Beacon.Topic is
 
    --  Blocks until a message is available.
    procedure Receive (S : in out Subscriber; Msg : out Message_Type)
+     with Pre => Is_Registered (S);
+
+   --  Blocks until a message is available or Timeout elapses.
+   --  Success is True if a message was retrieved, False on timeout.
+   procedure Receive
+     (S       : in out Subscriber;
+      Msg     : out Message_Type;
+      Timeout : Ada.Real_Time.Time_Span;
+      Success : out Boolean)
      with Pre => Is_Registered (S);
 
    procedure Try_Receive
