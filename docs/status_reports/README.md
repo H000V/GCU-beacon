@@ -13,6 +13,7 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **SR-02** | **Week 5** | 10/11/2026 | **3%** | Seed repository architecture audit, project charter formulation, roles & responsibilities finalization, and initial research into SPARK verification. | [`STATUS_REPORT_02_OCT_11.md`](STATUS_REPORT_02_OCT_11.md) |
 | **SR-03** | **Week 6** | 10/18/2026 | **5%** | Stakeholder consultations with Olivier Henley (AdaCore) and Steven Faulkner (GCU), requirements matrix formulation, and Design Review 1 preparation. | [`STATUS_REPORT_03_OCT_18.md`](STATUS_REPORT_03_OCT_18.md) |
 | **SR-04** | **Week 7** | 10/25/2026 | **7%** | Successful delivery of **Milestone 1: Design Review Presentation 1**, team roster consolidation (Ryan Tomasko assumes Validation role), and kickoff of Timed `Receive`. | [`STATUS_REPORT_04_OCT_25.md`](STATUS_REPORT_04_OCT_25.md) |
+| **SR-05** | **Week 8** | 11/01/2026 | **10%** | Implementation and unit test verification of timed `Receive` (Tasks 2.1 & 2.2), closure of Open Design Decision 3, and hardening protected entry barriers for Phase 2 completion. | [`STATUS_REPORT_05_NOV_01.md`](STATUS_REPORT_05_NOV_01.md) |
 
 ---
 
@@ -40,10 +41,14 @@ This directory catalogs the weekly progress updates and status reports submitted
 | timeouts, registry lockdown, try-pub)                                  10/14 & 10/15 closed all |
 |                                                                        architectural decisions. |
 |-------------------------------------------------------------------------------------------------|
-| Team Member Withdrawal & Roster        Week 7 (7%)    Mitigated        Team consolidated into   |
+| Team Member Withdrawal & Roster        Week 7 (7%)    Resolved         Team consolidated into   |
 | Transition                                                             3-member structure; Ryan |
 |                                                                        Tomasko assumed all      |
 |                                                                        Validation duties.       |
+|-------------------------------------------------------------------------------------------------|
+| Multi-Task Synchronization &           Week 8 (10%)   Monitored        Ceiling Priority Protocol|
+| Protected Barrier Concurrency                                          and deterministic task   |
+|                                                                        rendez-vous in tests.    |
 +-------------------------------------------------------------------------------------------------+
 ```
 

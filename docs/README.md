@@ -17,13 +17,14 @@ This directory contains the systems engineering documentation, project charter, 
 | [`DESIGN_CONCEPTS_PRESENTATION.md`](DESIGN_CONCEPTS_PRESENTATION.md) | **Capstone Design Concepts & Architectural Trade Study Document**<br>In-depth architectural specification and complete presentation transcript with embedded speaker notes, requirements traceability matrix, and technical interrogation answers. | Markdown (`.md`) |
 | [`SPEAKER_NOTES.md`](SPEAKER_NOTES.md) | **Presentation Speaker Script & Rehearsal Notes**<br>Slide-by-slide verbal script with timed rehearsal windows (13m 45s target) and consolidated 3-person team role allocations across Hovan, Praise, and Ryan. | Markdown (`.md`) |
 | [`beacon.gantt`](beacon.gantt) | **Mermaid Gantt Chart**<br>Visual schedule tracking weekly sprint tasks and milestones across Fall 2026 and Spring 2027. | Mermaid Gantt (`.gantt`) |
-| [`status_reports/`](status_reports/README.md) | **Weekly Status Reports Directory & Catalog**<br>Chronological catalog containing Weekly Status Updates (SR-01 to SR-04, Weeks 4–7) covering project progress, milestones, risk monitoring, and team transition updates. | Directory / Reports |
+| [`status_reports/`](status_reports/README.md) | **Weekly Status Reports Directory & Catalog**<br>Chronological catalog containing Weekly Status Updates (SR-01 to SR-05, Weeks 4–8) covering project progress, milestones, risk monitoring, and team transition updates. | Directory / Reports |
 
 ---
 
-## Architecture Visuals
+## Architecture & Schedule Visuals
 
 - System Layering Diagram: [`assets/beacon_architecture_layers.png`](assets/beacon_architecture_layers.png)
+- Fall 2026 Gantt Schedule Chart: [`assets/beacon_gantt_chart_fall2026.png`](assets/beacon_gantt_chart_fall2026.png)
 
 ---
 
