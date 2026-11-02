@@ -7,6 +7,7 @@ project Tests is
    for Create_Missing_Dirs use "True";
    for Main use ("queue_tests.adb", "topic_tests.adb", "wire_tests.adb");
    package Compiler is
+      for Local_Configuration_Pragmas use "../gnat.adc";
       for Default_Switches ("Ada") use
         ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVa", "-gnatyg", "-gnatyM100", "-g", "-O1");
    end Compiler;

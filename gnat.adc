@@ -1,0 +1,2 @@
+pragma Locking_Policy (Ceiling_Locking);
+pragma Queuing_Policy (Priority_Queuing);

@@ -16,7 +16,7 @@ package body Beacon.Topic is
          if Mode = Best_Effort then
             Ring.Push_Dropping_Oldest (Q, Msg, Dropped);
             if Dropped then
-               Drops := Drops + 1;
+               Drops := (if Drops = Natural'Last then Drops else Drops + 1);
             end if;
          else
             Ring.Push (Q, Msg);
@@ -29,7 +29,7 @@ package body Beacon.Topic is
          if Mode = Best_Effort then
             Ring.Push_Dropping_Oldest (Q, Msg, Dropped);
             if Dropped then
-               Drops := Drops + 1;
+               Drops := (if Drops = Natural'Last then Drops else Drops + 1);
             end if;
             Accepted := True;
          elsif Ring.Is_Full (Q) then

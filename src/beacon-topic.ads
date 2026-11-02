@@ -18,11 +18,13 @@
 
 with Ada.Real_Time;
 with Beacon.Queue;
+with System;
 
 generic
    type Message_Type is private;
-   Queue_Depth     : Positive;
-   Max_Subscribers : Positive := 8;
+   Queue_Depth      : Positive;
+   Max_Subscribers  : Positive := 8;
+   Ceiling_Priority : System.Any_Priority := System.Priority'Last;
 package Beacon.Topic is
 
    type Publisher is limited private;
@@ -102,7 +104,9 @@ private
 
    package Ring is new Beacon.Queue (Message_Type, Queue_Depth);
 
-   protected type Bounded_Queue (Mode : Delivery_Mode) is
+   protected type Bounded_Queue (Mode : Delivery_Mode)
+     with Priority => Ceiling_Priority
+   is
       --  Barrier: Best_Effort always open; Reliable open when not full.
       entry Push (Msg : Message_Type);
       procedure Try_Push (Msg : Message_Type; Accepted : out Boolean);

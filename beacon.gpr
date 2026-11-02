@@ -20,6 +20,7 @@ library project Beacon is
    for Create_Missing_Dirs use "True";
 
    package Compiler is
+      for Local_Configuration_Pragmas use "gnat.adc";
       for Default_Switches ("Ada") use
         ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVa",
          "-gnatyg", "-gnatyM100", "-g", "-O1", "-fstack-check");
