@@ -14,6 +14,7 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **SR-03** | **Week 6** | 10/18/2026 | **5%** | Stakeholder consultations with Olivier Henley (AdaCore) and Steven Faulkner (GCU), requirements matrix formulation, and Design Review 1 preparation. | [`STATUS_REPORT_03_OCT_18.md`](STATUS_REPORT_03_OCT_18.md) |
 | **SR-04** | **Week 7** | 10/25/2026 | **7%** | Successful delivery of **Milestone 1: Design Review Presentation 1**, team roster consolidation (Ryan Tomasko assumes Validation role), and kickoff of Timed `Receive`. | [`STATUS_REPORT_04_OCT_25.md`](STATUS_REPORT_04_OCT_25.md) |
 | **SR-05** | **Week 8** | 11/01/2026 | **10%** | Implementation and unit test verification of timed `Receive` (Tasks 2.1 & 2.2), closure of Open Design Decision 3, and hardening protected entry barriers for Phase 2 completion. | [`STATUS_REPORT_05_NOV_01.md`](STATUS_REPORT_05_NOV_01.md) |
+| **SR-06** | **Week 9** | 11/08/2026 | **13%** | Hardening protected queue barriers with CPP (Task 2.3), formal inductive proof and Ada Type_Invariant verification for Best-Effort ring buffer drop-oldest arithmetic (Task 3.1). | [`STATUS_REPORT_06_NOV_08.md`](STATUS_REPORT_06_NOV_08.md) |
 
 ---
 
@@ -46,9 +47,13 @@ This directory catalogs the weekly progress updates and status reports submitted
 |                                                                        Tomasko assumed all      |
 |                                                                        Validation duties.       |
 |-------------------------------------------------------------------------------------------------|
-| Multi-Task Synchronization &           Week 8 (10%)   Monitored        Ceiling Priority Protocol|
-| Protected Barrier Concurrency                                          and deterministic task   |
-|                                                                        rendez-vous in tests.    |
+| Multi-Task Synchronization &           Week 8 (10%)   Mitigated        Ceiling Priority Protocol|
+| Protected Barrier Concurrency                                          in gnat.adc and priority |
+|                                                                        aspects on queues.       |
+|-------------------------------------------------------------------------------------------------|
+| High-Frequency Soak Stress &           Week 9 (13%)   Active           Phased test ramp-up with |
+| Task Scheduling Jitter (Task 3.3)                                       property tests and CPU   |
+|                                                                        affinity monitoring.     |
 +-------------------------------------------------------------------------------------------------+
 ```
 
