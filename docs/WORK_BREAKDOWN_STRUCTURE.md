@@ -121,7 +121,7 @@ flowchart LR
 
 * **Task 3.1: Verify Best-Effort Drop-Oldest**
   * **Lead Engineer:** Hovan Hodges (Core Systems Engineer) & Ryan Tomasko (Security & Validation Engineer)
-  * **Description:** Verify ring buffer overwrite-oldest pointer arithmetic in [`src/beacon-queue.adb`](../src/beacon-queue.adb) to guarantee accurate drop counting and zero corruption.
+  * **Description:** Verify ring buffer overwrite-oldest pointer arithmetic in [`src/beacon-queue.adb`](../src/beacon-queue.adb) to guarantee accurate drop counting and zero corruption. Formal inductive proof and Ada `Type_Invariant` contract implemented; verified with GNAT/SPARK (see [`docs/TASK_3_1_VERIFICATION_REPORT.md`](TASK_3_1_VERIFICATION_REPORT.md)).
   * **Resources Required:** GNAT tracing utilities; [`src/beacon-queue.adb`](../src/beacon-queue.adb); Visual Studio Code.
   * **Time Needed:** 12 hours | **Duration:** 1 week (Nov 02 – Nov 08, 2026).
   * **Costs Associated:** \$0.

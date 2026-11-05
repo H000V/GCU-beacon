@@ -19,7 +19,12 @@ package Beacon.Queue
   with SPARK_Mode => On
 is
 
-   type Queue_Type is private;
+   type Queue_Type is private
+     with Type_Invariant => Invariant (Queue_Type);
+
+   --  Formal ring buffer invariant: Tail = (Head + Fill) mod Depth.
+   --  Visible to allow callers and verification suites to inspect consistency.
+   function Invariant (Q : Queue_Type) return Boolean;
 
    Empty_Queue : constant Queue_Type;
    --  The only way to get a well-formed queue. Element slots are left
@@ -69,6 +74,9 @@ private
    --  read. Expect to need Relaxed_Initialization to convince flow analysis.
 
    function Count (Q : Queue_Type) return Natural is (Q.Fill);
+
+   function Invariant (Q : Queue_Type) return Boolean is
+     (Q.Tail = (Q.Head + Q.Fill) mod Depth);
 
    pragma Warnings (Off, "component ""Buffer"" of type ""Element_Array"" is uninitialized");
    Empty_Queue : constant Queue_Type := (Buffer => <>, Head => 0, Tail => 0, Fill => 0);

@@ -10,6 +10,7 @@ is
       Q.Buffer (Q.Tail) := Item;
       Q.Tail := Next (Q.Tail);
       Q.Fill := Q.Fill + 1;
+      pragma Assert (Invariant (Q));
    end Push;
 
    procedure Push_Dropping_Oldest
@@ -27,6 +28,7 @@ is
       else
          Push (Q, Item);
       end if;
+      pragma Assert (Invariant (Q));
    end Push_Dropping_Oldest;
 
    procedure Pop (Q : in out Queue_Type; Item : out Element_Type) is
@@ -34,6 +36,7 @@ is
       Item := Q.Buffer (Q.Head);
       Q.Head := Next (Q.Head);
       Q.Fill := Q.Fill - 1;
+      pragma Assert (Invariant (Q));
    end Pop;
 
 end Beacon.Queue;
