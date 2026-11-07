@@ -19,6 +19,7 @@ jobs:
           cd tests
           alr -n build
           ./bin/queue_tests
+          ./bin/queue_property_tests
           ./bin/topic_tests
           ./bin/wire_tests
       - name: In-process demo (reliable never drops, best-effort keeps newest)

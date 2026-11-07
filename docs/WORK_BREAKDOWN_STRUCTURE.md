@@ -135,8 +135,8 @@ flowchart LR
 
 * **Task 3.2: Drop-Oldest Invariant & Property Tests**
   * **Lead Engineer:** Ryan Tomasko (Security & Validation Engineer)
-  * **Description:** Build property-based randomized test generators to stress test ring buffer wrap-around, head/tail consistency, and FIFO sequence preservation.
-  * **Resources Required:** Property-based randomized test generator; multi-core test host; [`tests/src/`](../tests/src); Visual Studio Code.
+  * **Description:** Build property-based randomized test generators to stress test ring buffer wrap-around, head/tail consistency, and FIFO sequence preservation. **Complete (11/07/2026):** [`tests/src/queue_property_tests.adb`](../tests/src/queue_property_tests.adb) checks `Beacon.Queue` against a reference model after every step: FIFO order, drop-oldest, ring invariant, fill level, drop accounting and contracts. It runs 1,000,000 ops at each of 12 depths with a fixed seed, in CI. It caught all 4 seeded ring bugs (see [`docs/TASK_3_2_VERIFICATION_REPORT.md`](TASK_3_2_VERIFICATION_REPORT.md)).
+  * **Resources Required:** Randomized model-based test generator (hand-rolled, `Ada.Numerics.Discrete_Random`); [`tests/src/`](../tests/src); Visual Studio Code.
   * **Time Needed:** 16 hours | **Duration:** 1 week (Nov 02 – Nov 08, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**

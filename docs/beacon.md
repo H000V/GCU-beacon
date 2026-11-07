@@ -109,7 +109,7 @@
 
 * **Task 3.2: Drop-Oldest Invariant & Property Tests**
   * **Lead Engineer:** Ryan Tomasko (Security & Validation Engineer)
-  * **Resources Required:** Property-based randomized test generator; multi-core test host; [`tests/src/`](../tests/src); Visual Studio Code.
+  * **Resources Required:** Randomized model-based test generator (hand-rolled, `Ada.Numerics.Discrete_Random`); [`tests/src/`](../tests/src); Visual Studio Code.
   * **Time Needed:** 16 hours | **Duration:** 1 week (Nov 02 – Nov 08, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
