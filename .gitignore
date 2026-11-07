@@ -7,3 +7,4 @@ config/
 *.ali
 gnatprove/
 demo/sub.log
+.als-alire

@@ -30,8 +30,10 @@ library project Beacon is
       for Switches ("Ada") use ("-Es");
    end Binder;
 
-   --  gnatprove -P beacon.gpr --mode=all
-   --  Only Beacon and Beacon.Queue carry SPARK_Mode => On.
+   --  Only Beacon and Beacon.Queue carry SPARK_Mode => On. GNATprove skips
+   --  generic units, so proving this project alone covers nothing in
+   --  Beacon.Queue. Prove an instance instead:
+   --     gnatprove -P prove/prove.gpr -XBEACON_NETWORK=no --mode=all
    package Prove is
       for Proof_Switches ("Ada") use ("--level=2", "--timeout=30", "-j0");
    end Prove;

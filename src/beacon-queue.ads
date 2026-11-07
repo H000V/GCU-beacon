@@ -1,4 +1,6 @@
---  Beacon.Queue: bounded FIFO ring buffer. SPARK proof target (Silver).
+--  Beacon.Queue: bounded FIFO ring buffer. Proved with GNATprove:
+--  absence of runtime errors for every Depth, the ring invariant, and the
+--  Count contracts. Run it with prove/prove.gpr (see that file).
 --
 --  This is a plain data structure: no tasking, no protection, no I/O.
 --  Beacon.Topic wraps one of these in a protected type. Keeping the
@@ -9,8 +11,8 @@
 --
 --  Note on the proposal's sketch: `type Ring_Index is mod Queue_Depth`
 --  is illegal because a modulus must be static and a generic formal
---  object is not. Indices are a Natural subtype with an explicit
---  `mod Depth` on advance instead.
+--  object is not. Indices are a Natural subtype advanced with Add (in
+--  the private part), which wraps without overflowing.
 
 generic
    type Element_Type is private;
@@ -19,11 +21,13 @@ package Beacon.Queue
   with SPARK_Mode => On
 is
 
-   type Queue_Type is private
-     with Type_Invariant => Invariant (Queue_Type);
+   --  Carries the type invariant Tail = (Head + Fill) mod Depth. SPARK
+   --  only accepts Type_Invariant on the full view, so it is in the
+   --  private part.
+   type Queue_Type is private;
 
-   --  Formal ring buffer invariant: Tail = (Head + Fill) mod Depth.
-   --  Visible to allow callers and verification suites to inspect consistency.
+   --  The ring buffer invariant, Tail = (Head + Fill) mod Depth. Visible
+   --  so callers and verification suites can check consistency.
    function Invariant (Q : Queue_Type) return Boolean;
 
    Empty_Queue : constant Queue_Type;
@@ -49,7 +53,7 @@ is
       Item    : Element_Type;
       Dropped : out Boolean)
      with Post => Dropped = Is_Full (Q'Old)
-                  and then Count (Q) = Natural'Min (Count (Q'Old) + 1, Depth);
+                  and then Count (Q) = (if Dropped then Depth else Count (Q'Old) + 1);
 
    procedure Pop (Q : in out Queue_Type; Item : out Element_Type)
      with Pre  => not Is_Empty (Q),
@@ -59,28 +63,38 @@ private
 
    subtype Ring_Index is Natural range 0 .. Depth - 1;
 
-   type Element_Array is array (Ring_Index) of Element_Type;
+   --  (I + K) mod Depth, written so that nothing overflows even when
+   --  Depth is close to Positive'Last.
+   function Add (I : Ring_Index; K : Natural) return Ring_Index is
+     (if K < Depth - I then I + K else K - (Depth - I))
+     with Pre => K <= Depth;
+
+   --  Relaxed_Initialization: Element_Type may have no default value, so
+   --  Buffer starts uninitialized. The type invariant below states which
+   --  slots are initialized: exactly the Fill slots starting at Head,
+   --  which are the only ones ever read.
+   type Element_Array is array (Ring_Index) of Element_Type
+     with Relaxed_Initialization;
 
    type Queue_Type is record
       Buffer : Element_Array;
       Head   : Ring_Index := 0;   --  next slot to Pop
       Tail   : Ring_Index := 0;   --  next slot to Push
       Fill   : Natural range 0 .. Depth := 0;
-   end record;
-   --  Invariant to carry through proof:
-   --    Tail = (Head + Fill) mod Depth
-   --  Buffer is deliberately not initialized (Element_Type may have no
-   --  default). Only slots Head .. Head + Fill - 1 (mod Depth) are ever
-   --  read. Expect to need Relaxed_Initialization to convince flow analysis.
+   end record
+     with Type_Invariant =>
+       Tail = Add (Head, Fill)
+       and then (for all K in 0 .. Fill - 1 => Buffer (Add (Head, K))'Initialized);
+   --  The invariant is written on the components because SPARK does not
+   --  let it call Invariant, a boundary function of its own type.
 
    function Count (Q : Queue_Type) return Natural is (Q.Fill);
 
    function Invariant (Q : Queue_Type) return Boolean is
-     (Q.Tail = (Q.Head + Q.Fill) mod Depth);
+     (Q.Tail = Add (Q.Head, Q.Fill));
 
    pragma Warnings (Off, "component ""Buffer"" of type ""Element_Array"" is uninitialized");
    Empty_Queue : constant Queue_Type := (Buffer => <>, Head => 0, Tail => 0, Fill => 0);
    pragma Warnings (On, "component ""Buffer"" of type ""Element_Array"" is uninitialized");
-   --  Buffer is deliberately uninitialized: see the comment above.
 
 end Beacon.Queue;
