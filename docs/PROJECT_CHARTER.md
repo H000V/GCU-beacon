@@ -2,7 +2,7 @@
 # BEACON: Typed Publish-Subscribe Messaging Library in Ada
 ## Project Charter
 
-**Version:** 1.0  
+**Version:** 1.11  
 **Date:** October 4, 2026  
 **Course:** STG-455: Capstone Project I  
 **Institution:** Grand Canyon University (GCU)  
@@ -18,6 +18,7 @@
 | :--- | :--- | :--- | :--- |
 | 10/04/2026 | 1.00 | Initial Project Charter Creation | H. Hodges, R. Tomasko, P. Jibunor |
 | 10/28/2026 | 1.10 | Team Consolidation (Ryan Tomasko assumes all Validation Engineer duties) | H. Hodges, R. Tomasko, P. Jibunor |
+| 11/06/2026 | 1.11 | Milestone schedule aligned with the Work Breakdown Structure (28 weeks, Milestones 1–8); configurable `Try_Publish` formally deferred | H. Hodges, R. Tomasko, P. Jibunor |
 
 ---
 
@@ -97,7 +98,7 @@ The Beacon capstone project operates under several strict technical, operational
 
 * **Compile-Time Type Safety:** The library must use Ada generics exclusively for message type definition; untyped byte buffers, `void*` casts, and `System.Address` payloads are prohibited in the public API.
 * **Bounded Memory Allocation:** All subscriber queues must be statically bounded at instantiation with no dynamic growth, ensuring zero heap allocation occurs within the core [`src/`](../src) directory.
-* **Network Independence in Core:** The in-process backend ([`src/beacon-topic.ads`](../src/beacon-topic.ads) and [`src/beacon-queue.ads`](../src/beacon-queue.ads) must compile and run completely free of any network dependencies or socket libraries.
+* **Network Independence in Core:** The in-process backend ([`src/beacon-topic.ads`](../src/beacon-topic.ads) and [`src/beacon-queue.ads`](../src/beacon-queue.ads)) must compile and run completely free of any network dependencies or socket libraries.
 * **Wire Framing Discipline:** Message framing for the network transport must be implemented using Ada representation clauses overlaid on records, strictly avoiding manual byte-packing via bit-shifts and masks.
 
 ### Assumptions
@@ -112,7 +113,7 @@ The Beacon capstone project operates under several strict technical, operational
 
 | Risk Identified | Root Cause / Context | Mitigation Strategy |
 | :--- | :--- | :--- |
-| **Exploits / Backdoors from Coding Inexperience** | Potential vulnerabilities or logic flaws resulting from team members' initial learning curve with Ada tasking and memory semantics. | Implement rigorous automated AUnit testing, peer code reviews, mentor signoffs, and a thorough final code-hardening and polishing audit. |
+| **Exploits / Backdoors from Coding Inexperience** | Potential vulnerabilities or logic flaws resulting from team members' initial learning curve with Ada tasking and memory semantics. | Implement rigorous automated unit testing (hand-written Ada test executables), peer code reviews, mentor signoffs, and a thorough final code-hardening and polishing audit. |
 | **In-Transit Message Injection & Tampering** | Malicious tasks injecting or altering payloads over the network transport. | Implement IEEE 802.3 CRC-32 frame validation on wire headers and evaluate transport-level payload encryption. |
 | **Generic Instantiation & Type Constraints** | Complex generic parameterization potentially limiting supported message types or causing compilation/elaboration issues. | Frequently test generic instantiations across primitive, record, and composite types in continuous integration builds. |
 
@@ -120,16 +121,20 @@ The Beacon capstone project operates under several strict technical, operational
 
 ## Summary Milestone Schedule
 
+The schedule below follows the [Work Breakdown Structure](WORK_BREAKDOWN_STRUCTURE.md) and [`beacon.gantt`](beacon.gantt), which hold the task-level dates, owners and dependencies. Fall 2026 is Weeks 1–15; Spring 2027 is Weeks 16–28, after the winter break (Dec 20 – Jan 03) and with a spring break code freeze (Mar 15 – Mar 21).
+
 | Timeline | Milestone Goals & Deliverables |
 | :--- | :--- |
-| **Weeks 1–4: Architecture & Generic Design** | • Design the `Beacon.Topic` generic package: publisher, subscriber, delivery modes.<br>• Specify the protected queue type and overflow behavior for both delivery modes.<br>• Mentor architecture review at Week 4: generic interface signoff. |
-| **Weeks 5–8: In-Process Backend** | • Implement bounded protected queue with Jorvik Ceiling Priority Protocol.<br>• Verify Reliable and Best-Effort delivery modes operating concurrently.<br>• Execute single-process test: multiple publishers and subscribers on different topic instantiations. |
-| **Weeks 9–12: Demonstration & Checkpoint** | • Develop simulated telemetry application: 2–3 topics at varying rates with mixed modes.<br>• Load testing: verify reliable mode never drops data, best-effort drops oldest under overflow.<br>• Tag and release `v0.1.0-inproc` backend checkpoint. |
-| **Weeks 13–16: Network Backend Design & Prototype** | • Design UDP multicast transport with 14-byte representation-claused wire framing.<br>• Establish first cross-process publish and receive between separate processes on the same host. |
-| **Weeks 17–22: Network Backend Completion** | • Full UDP multicast backend supporting multiple publishers and subscribers across processes.<br>• Static participant and topic configuration.<br>• Extend demonstration application to operate across physical/virtual network bridges. |
-| **Weeks 23–26: SPARK Verification & Robustness** | • Run GNATprove on `Beacon.Queue` targeting formal SPARK Silver proof.<br>• Execute sustained multi-task stress and soak testing under peak load.<br>• Benchmark latency and jitter comparing in-process vs. network backends. |
-| **Weeks 27–29: Documentation & Alire Packaging** | • Comprehensive API reference and delivery guarantee specification.<br>• Comparative whitepaper: architectural trade study between Beacon and full OMG DDS.<br>• Package manifest preparation for Alire community index (`adacore_beacon`). |
-| **Weeks 30–32: Final Demonstration & Delivery** | • Live demonstration: multi-process simulated sensor network under mixed delivery modes.<br>• Capstone final defense report defending delivery guarantees and generic design.<br>• Submission of `adacore_beacon` crate to Alire community index. |
+| **Weeks 1–6 (Sep 07 – Oct 18): Environment Setup & Design Decisions** | • Toolchain setup and build verification (Alire, GNAT 2022).<br>• Audit of the seed repository.<br>• Open design decisions resolved with stakeholders (Oct 14–15). |
+| **Weeks 7–8 (Oct 19 – Nov 01): Timed Receive & Design Review 1** | • Timed `Receive` with unit tests.<br>• Protected queue entry barriers hardened with the Ceiling Priority Protocol; multi-task blocking-publish test.<br>• **Milestone 1:** Design Review Presentation 1 (Oct 22). |
+| **Weeks 9–11 (Nov 02 – Nov 22): In-Process Soak & Demo Release** | • Drop-oldest ring buffer verified (GNATprove proof of `Beacon.Queue`) and property tests.<br>• Multi-task soak test; zero-heap and Jorvik profile audit; subscriber lifecycle and registry lockdown.<br>• **Milestone 2:** In-process backend demo and `v0.1.0-inproc` release (Nov 22). |
+| **Weeks 12–14 (Nov 23 – Dec 13): Wire Protocol & UDP Prototype** | • 14-byte representation-claused wire header with CRC-32 tests; loopback transport and bridge tests.<br>• UDP multicast transport and bridge tasks; first cross-process publish and receive with headless CI.<br>• **Milestone 3:** Cross-process UDP demo (Dec 13). |
+| **Week 15 (Dec 14 – Dec 20): Serial Transport & Fall Finish** | • Serial transport architecture with stream framing; virtual-port loopback tests.<br>• **Milestone 4:** Design Review Presentation 2 (Dec 18). |
+| **Weeks 16–19 (Jan 04 – Jan 31): Distributed Demo & Hardening** | • Multi-publisher sequence-gap tracking; distributed sensor nodes and ground station dashboard.<br>• Cross-platform builds; dynamic UDP/serial transport switch; multi-node soak test.<br>• **Milestone 5:** Full distributed system signoff (Jan 31). |
+| **Weeks 20–25 (Feb 01 – Mar 14): SPARK Proof & Development Finish** | • SPARK proof work on `Beacon.Queue` (Silver completed early in Week 9; this block is re-planned at the end of fall).<br>• Node failover and reconnect hardening; memory and zero-leak profiling; feature freeze.<br>• **Milestone 6:** Pre-spring break code freeze (Mar 14). |
+| **Week 26 (Mar 22 – Mar 28): Benchmarking & Loss Profiling** | • Latency and jitter microbenchmarks; physical LAN multicast loss profiling; protected queue lock contention analysis. |
+| **Week 27 (Mar 29 – Apr 04): Packaging & DDS Comparative Paper** | • Alire manifest (`adacore_beacon`) and clean-room crate verification.<br>• Beacon vs. OMG DDS comparative whitepaper; API reference and quickstart guide.<br>• **Milestone 7:** Packaging and whitepaper signoff (Apr 04). |
+| **Week 28 (Apr 05 – Apr 12): Final Defense & Alire Publish** | • Multi-laptop live demonstration rehearsal; submission of `adacore_beacon` to the Alire community index.<br>• **Milestone 8:** Senior capstone final defense (Apr 12). |
 
 ---
 
@@ -172,11 +177,11 @@ flowchart TD
 ### Roles and Responsibilities
 
 * **Core Systems Engineer (Hovan Hodges):**  
-  Responsible for core library architecture, generic package design ([`src/beacon.ads`](../src/beacon.ads), [`src/beacon-topic.ads`](../src/beacon-topic.ads), [`src/beacon-queue.ads`](../src/beacon-queue.ads), protected object synchronization primitives, and SPARK Silver proof contracts.
+  Responsible for core library architecture, generic package design ([`src/beacon.ads`](../src/beacon.ads), [`src/beacon-topic.ads`](../src/beacon-topic.ads), [`src/beacon-queue.ads`](../src/beacon-queue.ads)), protected object synchronization primitives, and SPARK Silver proof contracts.
 * **Network Systems Engineer (Praise Jibunor):**  
-  Responsible for network transport architecture ([`src/net/beacon-wire.ads`](../src/net/beacon-wire.ads), [`src/net/beacon-transport-udp.adb`](../src/net/beacon-transport-udp.adb), [`src/net/beacon-bridge.ads`](../src/net/beacon-bridge.ads), IEEE 802.3 CRC-32 integrity validation, representation clause framing, and serial stream bridges.
+  Responsible for network transport architecture ([`src/net/beacon-wire.ads`](../src/net/beacon-wire.ads), [`src/net/beacon-transport-udp.adb`](../src/net/beacon-transport-udp.adb), [`src/net/beacon-bridge.ads`](../src/net/beacon-bridge.ads)), IEEE 802.3 CRC-32 integrity validation, representation clause framing, and serial stream bridges.
 * **Security & Validation Engineer (Ryan Tomasko):**  
-  Responsible for end-to-end software verification, validation, and security hardening: authoring automated AUnit unit and property test suites ([`tests/src/topic_tests.adb`](../tests/src/topic_tests.adb), [`tests/src/wire_tests.adb`](../tests/src/wire_tests.adb), executing multi-task concurrency soak stress tests, enforcing post-initialization publisher registry lockdown, managing embedded zero-heap memory profiling (`gnatmem`), validating queue barrier invariants, and maintaining headless cross-platform CI/CD verification workflows ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+  Responsible for end-to-end software verification, validation, and security hardening: authoring automated Ada unit test executables and property test suites ([`tests/src/topic_tests.adb`](../tests/src/topic_tests.adb), [`tests/src/wire_tests.adb`](../tests/src/wire_tests.adb)), executing multi-task concurrency soak stress tests, enforcing post-initialization publisher registry lockdown, managing embedded zero-heap memory profiling (`gnatmem`), validating queue barrier invariants, and maintaining headless cross-platform CI/CD verification workflows ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)).
 
 ---
 
@@ -197,6 +202,8 @@ flowchart TD
 | **Blocking on Full Reliable Queue** | Ensure zero data loss (`Dropped = 0`) to critical reliable subscribers | OMG DDS QoS Reliability Policy | Verifying that `Dropped = 0` invariant holds when saturated queue blocks publisher |
 | **Bounded FIFO Ring Buffer for Queues** | Ensure deterministic sequential delivery without unbounded memory growth | ISO/IEC 8652 Jorvik Profile & SPARK | GNATprove SPARK Silver formal mathematical proof of buffer index boundaries |
 
+**Deferred requirement (11/06/2026): Configurable `Try_Publish` delivery policy** (FR-08 in the Design Review 1 deck). Stakeholder feedback asked for a choice between partial delivery and all-or-nothing delivery. Beacon currently provides partial delivery only. All-or-nothing cannot be made atomic across the per-subscriber protected queues without a publisher-side lock, so it needs its own design note. The requirement is deferred to Spring 2027 and will be scheduled when Phase 6 is re-planned at the end of the fall semester.
+
 ---
 
 ### Appendix B: References
@@ -216,8 +223,8 @@ flowchart TD
 
 | Industry Standard | Standard Description | How the Industry Standard Applies to Beacon |
 | :--- | :--- | :--- |
-| **ISO/IEC 8652 (Jorvik Profile)** | Ada programming language standard governing deterministic real-time embedded systems. | Beacon uses Ada 2022 as its core language; protected objects utilize the Jorvik profile with Ceiling Priority Protocol to prevent unbounded priority inversion. |
-| **IEEE 802.3 Cyclic Redundancy Check** | CRC-32 polynomial (`0xEDB88320`) used for network transmission integrity verification. | Beacon calculates and verifies CRC-32 checksums over the packed 14-byte wire frame headers before delivering payloads to subscribers. |
+| **ISO/IEC 8652 (Jorvik Profile)** | Ada programming language standard governing deterministic real-time embedded systems. | Beacon uses Ada 2022 as its core language; protected objects use the Ceiling Priority Protocol to prevent unbounded priority inversion, targeting Jorvik profile compliance (audited in Task 3.4). |
+| **IEEE 802.3 Cyclic Redundancy Check** | CRC-32 polynomial (`0xEDB88320`) used for network transmission integrity verification. | Beacon calculates and verifies CRC-32 checksums over each wire frame (the packed 14-byte header with its checksum field zeroed, plus the payload) before delivering payloads to subscribers. |
 | **UDP (RFC 768)** | Connectionless transport protocol standard for low-latency datagram delivery. | Beacon's network transport backend uses UDP datagrams to transport framed messages between isolated OS desktop processes. |
 | **IP Multicast (RFC 1112)** | Standard for one-to-many datagram transmission across local network segments. | Beacon utilizes IP multicast so that a single publisher dispatch efficiently reaches multiple distributed subscribers simultaneously. |
 | **The Open Group FACE (Transport Services Segment)** | US DoD standard decoupling typed business logic components from underlying transports (UDP, shared memory, bus). | Beacon mirrors the FACE TSS architecture by using compile-time typed generic topics, enforcing deterministic bounded queues with explicit delivery modes, and isolating network I/O in transparent bridge tasks. |

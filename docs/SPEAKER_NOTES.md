@@ -6,64 +6,64 @@
 **Instructor:** Professor Dwight Farris  
 **Team Mentor:** Steven Faulkner  
 **AdaCore GAP Coordinator:** Olivier Henley  
-**Target Duration:** 13 Minutes 45 Seconds (10–15 Minute Window)  
+**Target Duration:** 15 Minutes (15-minute limit; re-timed 11/06/2026 from measured script length at about 145 words per minute)  
 
 ---
 
 ### Timetable & Role Breakdown (Consolidated 3-Person Team)
 
 ```
-[00:00 - 00:45] Slide 1:  Title & Team Structure           --> Hovan Hodges (Core)
-[00:45 - 02:00] Slide 2:  Who is AdaCore & Target Users    --> Praise Jibunor (Network)
-[02:00 - 03:15] Slide 3:  Project Context & Justification  --> Hovan Hodges (Core)
-[03:15 - 04:15] Slide 4:  Engineering Ownership            --> Ryan Tomasko (Security & Validation)
-[04:15 - 05:45] Slide 5:  Stakeholder Feedback             --> Ryan Tomasko (Security & Validation)
-[05:45 - 07:15] Slide 6:  Functional Requirements Table    --> Ryan Tomasko (Security & Validation)
-[07:15 - 08:45] Slide 7:  Concept 1 Overview               --> Hovan Hodges (Core)
-[08:45 - 10:30] Slide 8:  Concept 1 Deep Dive & Sketches   --> Hovan Hodges & Ryan Tomasko
-[10:30 - 11:45] Slide 9:  Concept 2 Overview               --> Praise Jibunor (Network)
-[11:45 - 13:15] Slide 10: Concept 2 Deep Dive & Sketches   --> Praise Jibunor & Ryan Tomasko
-[13:15 - 14:45] Slide 11: Comparative Decision Matrix      --> Praise Jibunor (Network)
-[14:45 - 16:00] Slide 12: Industry Standards Application   --> Praise Jibunor (Network)
-[16:00 - 17:00] Slide 13: Next Steps & Gantt Gates         --> Hovan Hodges (Core)
-[17:00 - 17:45] Slide 14: Conclusion & Q&A                 --> All Team Members
+[00:00 - 00:40] Slide 1:  Title & Team Structure           --> Hovan Hodges (Core)
+[00:40 - 01:55] Slide 2:  Who is AdaCore & Target Users    --> Praise Jibunor (Network)
+[01:55 - 03:10] Slide 3:  Project Context & Justification  --> Hovan Hodges (Core)
+[03:10 - 04:05] Slide 4:  Engineering Ownership            --> Ryan Tomasko (Security & Validation)
+[04:05 - 05:35] Slide 5:  Stakeholder Feedback             --> Ryan Tomasko (Security & Validation)
+[05:35 - 06:50] Slide 6:  Functional Requirements Table    --> Ryan Tomasko (Security & Validation)
+[06:50 - 07:50] Slide 7:  Concept 1 Overview               --> Hovan Hodges (Core)
+[07:50 - 09:20] Slide 8:  Concept 1 Deep Dive & Sketches   --> Hovan Hodges & Ryan Tomasko
+[09:20 - 10:15] Slide 9:  Concept 2 Overview               --> Praise Jibunor (Network)
+[10:15 - 11:25] Slide 10: Concept 2 Deep Dive & Sketches   --> Praise Jibunor & Ryan Tomasko
+[11:25 - 12:20] Slide 11: Comparative Decision Matrix      --> Praise Jibunor (Network)
+[12:20 - 13:20] Slide 12: Industry Standards Application   --> Praise Jibunor (Network)
+[13:20 - 14:15] Slide 13: Next Steps & Gantt Gates         --> Hovan Hodges (Core)
+[14:15 - 15:00] Slide 14: Conclusion & Q&A                 --> All Team Members
 ```
 
 ---
 
 ### Slide 1: Title & Presentation Header
 * **Presenter:** Hovan Hodges (Core Engineer)
-* **Target Time:** 0:45 (Running Total: 0:45)
+* **Target Time:** 0:40 (Running Total: 0:40)
 * **Slide Visual:** Title header, institutional credits (GCU, Professor Farris, Steven Faulkner, Olivier Henley), and the three team roles.
 
 > **Spoken Script:**  
-> "Good morning, Professor Farris, Steven Faulkner, and fellow engineering students. Today, our capstone team—Hovan Hodges, Ryan Tomasko, and Praise Jibunor—presents the Initial Design Concepts, Requirements Traceability, and Architectural Trade Study for Project **Beacon: Typed Publish-Subscribe Messaging in Ada**.
+> "Good morning, Professor Farris, Steven Faulkner, and fellow engineering students. Today, our capstone team—Hovan Hodges, Ryan Tomasko, and Praise Jibunor—presents the design concepts and trade study for Project **Beacon: Typed Publish-Subscribe Messaging in Ada**.
 >
 > Conducted in partnership with AdaCore’s GNAT Academic Program under our mentor Olivier Henley, Project Beacon provides a type-safe, deterministic publish-subscribe communications library engineered for safety-critical aerospace and embedded computing. 
 >
-> Over the next thirteen minutes, we will walk you through who our sponsor AdaCore is and who will use this project, our stakeholder feedback, our quantifiable requirements, two contrasting design concepts with detailed schematics and sketches, our formal trade study evaluation, and our verified roadmap to completion. Praise will now introduce our industry sponsor and target user community."
+> Over the next fifteen minutes, we will cover our sponsor and users, stakeholder feedback, requirements, two contrasting design concepts, our trade study, and our roadmap. Praise will now introduce our industry sponsor."
 
 ---
 
 ### Slide 2: Industry Sponsorship & Target Users — Who is AdaCore & Who Will Use Beacon?
 * **Presenter:** Praise Jibunor (Network Engineer)
-* **Target Time:** 1:15 (Running Total: 2:00)
+* **Target Time:** 1:15 (Running Total: 1:55)
 * **Slide Visual:** Company profile of AdaCore, GNAT Academic Program (GAP) mission, and the two-phased adoption diagram (IoT makers vs. aerospace enterprises).
 
 > **Spoken Script:**  
 > "Thank you, Hovan. On Slide 2, we address two foundational questions: Who is our industry sponsor AdaCore, and who is the intended audience for Project Beacon?
 >
-> AdaCore was founded in 1994 by the original designers of the GNAT Ada compiler at New York University. Today, they are the world's preeminent commercial provider of development tools and mathematical verification engines for the Ada and SPARK programming languages. If you look at high-assurance flight controls on the Airbus A350, Boeing commercial airliners, NASA’s Artemis lunar exploration spacecraft, or high-speed European rail signaling, that software is built and verified with AdaCore tools. Through the GNAT Academic Program, or GAP—coordinated by our mentor Olivier Henley—AdaCore sponsors capstone teams like ours to expand high-reliability software engineering.
+> AdaCore was founded in 1994 by the original designers of the GNAT Ada compiler at New York University. Today, they are the world's preeminent commercial provider of development tools and mathematical verification engines for the Ada and SPARK programming languages. Flight controls on the Airbus A350, NASA’s Artemis spacecraft, and European rail signaling are built and verified with AdaCore tools. Through the GNAT Academic Program, or GAP—coordinated by our mentor Olivier Henley—AdaCore sponsors capstone teams like ours.
 >
-> So who will use Beacon? As Olivier outlined during our stakeholder interview, Beacon follows a strategic, two-tiered adoption roadmap. In the near term, our primary users are **embedded IoT developers and robotics enthusiasts**. These makers are building autonomous drones, mobile rovers, and smart devices using microcontrollers like ARM Cortex-M and STM32. They need a lightweight, memory-efficient pub-sub library that doesn't drag in megabytes of C++ runtime or crash from dynamic heap fragmentation like ROS 2 and commercial DDS. They can install Beacon with a single command using the Alire package manager.
+> So who will use Beacon? As Olivier outlined during our stakeholder interview, Beacon follows a two-tiered adoption roadmap. In the near term, our primary users are **embedded IoT developers and robotics enthusiasts** building drones, rovers, and smart devices on microcontrollers like ARM Cortex-M. They need a lightweight pub-sub library with no large runtime and no dynamic heap, installed with a single Alire command.
 >
-> In the long term, because we design Beacon with total architectural completeness and zero heap, our platform scales to **aerospace and defense enterprises** building satellites, avionics, and radar systems that require DO-178C Level A and NASA spaceflight compliance. Now, Hovan will explain the technical problem context."
+> In the long term, because Beacon uses zero heap, it scales to **aerospace and defense enterprises** building satellites, avionics, and radar systems that require DO-178C Level A and NASA spaceflight compliance. Now, Hovan will explain the technical problem context."
 
 ---
 
 ### Slide 3: Project Context, Purpose & Justification
 * **Presenter:** Hovan Hodges (Core Engineer)
-* **Target Time:** 1:15 (Running Total: 3:15)
+* **Target Time:** 1:15 (Running Total: 3:10)
 * **Slide Visual:** Comparison table showing Traditional Middleware vs. Project Beacon.
 
 > **Spoken Script:**  
@@ -77,7 +77,7 @@
 
 ### Slide 4: Team Structure & Engineering Ownership
 * **Presenter:** Ryan Tomasko (Security & Validation Engineer)
-* **Target Time:** 1:00 (Running Total: 4:15)
+* **Target Time:** 0:55 (Running Total: 4:05)
 * **Slide Visual:** Organizational hierarchy chart and role breakdown.
 
 > **Spoken Script:**  
@@ -85,13 +85,13 @@
 >
 > Hovan Hodges serves as our Core Engineer, governing generic package specifications, bounded ring buffer arithmetic, and formal SPARK verification contracts. Praise Jibunor serves as our Network Engineer, owning wire framing representation clauses, UDP multicast sockets, and upcoming physical serial transports.
 >
-> As Security & Validation Engineer, my responsibility is twofold: I lead our automated AUnit test harnesses and sustained concurrency stress testing, while ensuring our architecture eliminates unauthorized publisher registration, prevents payload tampering via CRC-32 checks, and guarantees memory boundary integrity. We hold weekly engineering standups and work closely with our faculty mentor, Steven Faulkner, and AdaCore’s Olivier Henley. Now, let's examine our stakeholder findings."
+> As Security & Validation Engineer, my responsibility is twofold: I lead our automated Ada unit test executables and sustained concurrency stress testing, while ensuring our architecture eliminates unauthorized publisher registration, prevents payload tampering via CRC-32 checks, and guarantees memory boundary integrity. We hold weekly engineering standups and work closely with our faculty mentor, Steven Faulkner, and AdaCore’s Olivier Henley. Now, let's examine our stakeholder findings."
 
 ---
 
 ### Slide 5: Stakeholder Feedback Integration
 * **Presenter:** Ryan Tomasko (Security & Validation Engineer)
-* **Target Time:** 1:30 (Running Total: 5:45)
+* **Target Time:** 1:30 (Running Total: 5:35)
 * **Slide Visual:** Stakeholder interview cards for Olivier Henley (AdaCore) and Steven Faulkner (GCU).
 
 > **Spoken Script:**  
@@ -109,7 +109,7 @@
 
 ### Slide 6: Functional Requirements & Target Metric Values
 * **Presenter:** Ryan Tomasko (Security & Validation Engineer)
-* **Target Time:** 1:30 (Running Total: 7:15)
+* **Target Time:** 1:15 (Running Total: 6:50)
 * **Slide Visual:** 10-row Requirements Traceability Matrix with target values and measurement methods.
 
 > **Spoken Script:**  
@@ -119,13 +119,13 @@
 >
 > FR-03 enforces single-publisher ownership per topic, matching OMG DDS QoS policies. FR-04 mandates guaranteed reliable delivery: when a reliable queue saturates, the publisher must block, and the drop count must remain mathematically zero—verified under sustained multi-task load. 
 >
-> FR-05 enforces bounded FIFO queues with zero heap in `src/`, verified by a SPARK Silver formal proof under the Ada Jorvik profile. FR-06 and FR-07 implement our stakeholder directives for microsecond-precision timed receives and publisher registry lockdown. Finally, FR-09 demands sensor streaming at over 1,000 Hertz with under 50 microseconds of dispatch latency, verified in our flight telemetry demonstrator. Now, Hovan will introduce our baseline design concept."
+> FR-05 enforces bounded FIFO queues with zero heap in `src/`, with a SPARK Silver proof that the queue's index arithmetic is always safe, targeting the Ada Jorvik profile. FR-06 and FR-07 implement our stakeholder directives for microsecond-precision timed receives and publisher registry lockdown. Finally, FR-09 demands sensor streaming at over 1,000 Hertz with under 50 microseconds of dispatch latency, verified in our flight telemetry demonstrator. Now, Hovan will introduce our baseline design concept."
 
 ---
 
 ### Slide 7: Concept 1 Overview — Compile-Time Generic Protected Queues (Selected Baseline)
 * **Presenter:** Hovan Hodges (Core Engineer)
-* **Target Time:** 1:30 (Running Total: 8:45)
+* **Target Time:** 1:00 (Running Total: 7:50)
 * **Slide Visual:** Component architecture diagram of Concept 1 showing generic topics and protected queues.
 
 > **Spoken Script:**  
@@ -141,7 +141,7 @@
 
 ### Slide 8: Concept 1 Deep Dive — Assumptions, Schematics & Sketches
 * **Presenters:** Hovan Hodges (Core) & Ryan Tomasko (Security & Validation)
-* **Target Time:** 1:45 (Running Total: 10:30)
+* **Target Time:** 1:30 (Running Total: 9:20)
 * **Slide Visual:** Physical memory layout and ASCII concurrency schematic of Concept 1.
 
 > **Spoken Script (Hovan Hodges):**  
@@ -150,13 +150,13 @@
 > Looking at the sketch, trace the execution flow: when the Sensor Task calls `Publish`, it executes synchronously. In the left branch, Subscriber 1 is configured in `Reliable` mode: its entry barrier checks `Fill < Depth`. When full, the barrier closes, holding the calling task and guaranteeing that drop counts remain exactly zero. In the right branch, Subscriber 2 is `Best_Effort`: its entry barrier is unconditional. When full, pointer arithmetic pushes the head forward, overwriting the oldest sample to preserve the newest reading, while atomically incrementing the drop counter. Now, Ryan will speak to the security and boundary benefits."
 >
 > **Spoken Script (Ryan Tomasko):**  
-> "From a security standpoint, observe that the publisher registry is locked down. All subscribers register during startup elaboration before any task calls `Publish`. Once publishing begins, the registry is locked, preventing unauthorized third-party tasks from creating rogue publishers or injecting unverified data. Memory isolation is absolute because every queue is a private protected record."
+> "From a security standpoint, observe that publisher lockdown is enforced: `Create_Publisher` refuses a second publisher, preventing unauthorized third-party tasks from creating rogue publishers or injecting unverified data. All subscribers register during startup elaboration before any task calls `Publish`; today that is a documented rule, and locking the registry once publishing begins is planned. Memory isolation is absolute because every queue is a private protected record."
 
 ---
 
 ### Slide 9: Concept 2 Overview — Centralized Dynamic Broker with Heap Buffers
 * **Presenter:** Praise Jibunor (Network Engineer)
-* **Target Time:** 1:15 (Running Total: 11:45)
+* **Target Time:** 0:55 (Running Total: 10:15)
 * **Slide Visual:** Architecture block diagram of Concept 2 showing central broker task, string tables, and heap mailboxes.
 
 > **Spoken Script:**  
@@ -172,7 +172,7 @@
 
 ### Slide 10: Concept 2 Deep Dive — Assumptions, Schematics & Sketches
 * **Presenters:** Praise Jibunor (Network) & Ryan Tomasko (Security & Validation)
-* **Target Time:** 1:30 (Running Total: 13:15)
+* **Target Time:** 1:10 (Running Total: 11:25)
 * **Slide Visual:** Multi-hop heap pipeline sketch highlighting latency jitter, context switches, and memory hazards.
 
 > **Spoken Script (Praise Jibunor):**  
@@ -187,21 +187,21 @@
 
 ### Slide 11: Comparative Concept Assessment & Decision Matrix
 * **Presenter:** Praise Jibunor (Network Engineer)
-* **Target Time:** 1:30 (Running Total: 14:45)
-* **Slide Visual:** Quantitative Pugh Decision Matrix with 7 weighted criteria and scoring breakdown.
+* **Target Time:** 0:55 (Running Total: 12:20)
+* **Slide Visual:** Quantitative Pugh Decision Matrix with 6 weighted criteria and scoring breakdown.
 
 > **Spoken Script:**  
 > "Slide 11 presents our Systems Engineering Pugh Decision Matrix. In alignment with our Project Charter and stakeholder directives, safety-critical determinism, zero-heap bounds, and formal provability account for 75% of our total evaluation weight.
 >
-> Concept 1 scores a decisive **+1.75** out of a maximum +2.00. It receives top marks for compile-time type safety, zero dynamic heap allocation, guaranteed zero-drop reliability, and SPARK Silver provability.
+> Concept 1 scores a decisive **+1.70** out of a maximum +2.00. It receives top marks for compile-time type safety, zero dynamic heap allocation, guaranteed zero-drop reliability, and SPARK Silver provability.
 >
-> In contrast, Concept 2 receives a net negative score of **-1.50**. While Concept 2 scores high in runtime topology flexibility (+2)—since it supports dynamic topic creation—it fails completely in deterministic memory bounds, type safety, and DO-178C certifiability. Dynamic heap allocations cannot be formally proved under DO-333, and unpredictable heap exhaustion violates our core requirements. Therefore, our engineering team unanimously selects Concept 1 as our capstone baseline."
+> In contrast, Concept 2 receives a net negative score of **-1.40**. While Concept 2 scores high in runtime topology flexibility (+2)—since it supports dynamic topic creation—it fails completely in deterministic memory bounds, type safety, and DO-178C certifiability. Dynamic heap allocations cannot be formally proved under DO-333, and unpredictable heap exhaustion violates our core requirements. Therefore, our engineering team unanimously selects Concept 1 as our capstone baseline."
 
 ---
 
 ### Slide 12: Application of Appropriate Industry Standards
 * **Presenter:** Praise Jibunor (Network Engineer)
-* **Target Time:** 1:15 (Running Total: 16:00)
+* **Target Time:** 1:00 (Running Total: 13:20)
 * **Slide Visual:** Industry Standards Matrix detailing ISO 8652 Jorvik, IEEE 802.3, FACE TSS, NASA cFE, and OMG DDS.
 
 > **Spoken Script:**  
@@ -215,7 +215,7 @@
 
 ### Slide 13: Concept Development Next Steps & Gantt Schedule
 * **Presenter:** Hovan Hodges (Core Engineer)
-* **Target Time:** 1:00 (Running Total: 17:00)
+* **Target Time:** 0:55 (Running Total: 14:15)
 * **Slide Visual:** Gantt roadmap spanning Phase 2 through Phase 9 milestones.
 
 > **Spoken Script:**  
@@ -229,7 +229,7 @@
 
 ### Slide 14: Summary & Technical Interrogation (Q&A)
 * **Presenters:** All Team Members
-* **Target Time:** 0:45 + Open Q&A (Running Total: 17:45)
+* **Target Time:** 0:45 + Open Q&A (Running Total: 15:00)
 * **Slide Visual:** Project summary checklist and open floor notice for questions.
 
 > **Spoken Script (Hovan Hodges):**  
@@ -245,7 +245,7 @@
   * **Hovan Hodges:** *"Dynamic discovery requires runtime string parsing, dynamic memory allocation, and multicast discovery daemons, which violate DO-178C Level A determinism. In safety-critical aerospace and spaceflight systems—such as NASA cFE architectures—the communications topology is fully known at design time. Compile-time static generic instantiation eliminates discovery overhead, prevents schema mismatch bugs, and guarantees complete predictability."*
 
 * **Q2: "How does the system prevent unauthorized third-party tasks from publishing on sensitive topics?"**
-  * **Ryan Tomasko:** *"Following our consultation with Steven Faulkner, we rejected dynamic protected registries in favor of an initialization lockdown rule. All publishers and subscribers must be instantiated during pre-flight elaboration. Once publishing begins, the registry is locked, preventing unauthorized third-party tasks from declaring rogue publishers or injecting unverified data into the topic."*
+  * **Ryan Tomasko:** *"Following our consultation with Steven Faulkner, we rejected dynamic protected registries in favor of an initialization lockdown rule. All publishers and subscribers must be instantiated during pre-flight elaboration, before any `Publish`; today that is a documented rule. Publisher lockdown is enforced: `Create_Publisher` refuses a second publisher, preventing unauthorized third-party tasks from declaring rogue publishers or injecting unverified data into the topic. Locking the registry once publishing begins is planned."*
 
 * **Q3: "How do you verify that the uninitialized queue buffer does not leak garbage data?"**
   * **Hovan Hodges:** *"Because generic message types in Ada may lack default initialization, `Beacon.Queue` leaves unpopulated array slots uninitialized. We apply SPARK’s `Relaxed_Initialization` aspect and prove invariants `Tail = (Head + Fill) mod Depth`, mathematically guaranteeing through GNATprove that the system only reads valid slots between `Head` and `Tail`."*

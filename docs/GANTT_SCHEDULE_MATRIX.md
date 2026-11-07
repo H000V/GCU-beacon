@@ -29,9 +29,11 @@
 | | Zero-Heap & Embedded Jorvik Audit | | | | | | | | | | █ | | | | | |
 | | Expand Flight Telemetry Demo | | | | | | | | | | | █ | | | | |
 | | Tag In-Process Release v0.1.0-inproc | | | | | | | | | | | █ | | | | |
+| | Subscriber Lifecycle & Registry Lockdown | | | | | | | | | | | █ | | | | |
 | | **Milestone 2 - In-Process Backend Demo** | | | | | | | | | | | ★ | | | | |
 | **P4: Wire Protocol & UDP Prototype** *(Yellow)* | Wire Header Representation Clauses Layout | | | | | | | | | | | | █ | | | |
 | | Wire Framing & CRC-32 Unit Test Suite | | | | | | | | | | | | █ | | | |
+| | Loopback Transport & Bridge Tests | | | | | | | | | | | | █ | | | |
 | | GNAT.Sockets UDP Multicast Transport Tuning | | | | | | | | | | | | | █ | | |
 | | Bridge Egress & Ingress Task Integration | | | | | | | | | | | | | █ | | |
 | | Implement Cross-Process UDP Publish-Receive | | | | | | | | | | | | | | █ | |
@@ -51,14 +53,14 @@
 | **W2** | Sep 14 – Sep 20 | Team Charter & Role Distribution | — |
 | **W3** | Sep 21 – Sep 27 | Repository Provisioning & Pre-flight Setup | — |
 | **W4** | Sep 28 – Oct 04 | Toolchain Setup & GNAT 2022 Verification | Task 1.1 Complete |
-| **W5** | Oct 05 – Oct 11 | Seed Code Audit & Stakeholder Feedback Interviews | Task 1.2 Complete |
-| **W6** | Oct 12 – Oct 18 | Architectural Decisions Trade Study & Requirements Finalization | Task 1.3 Complete |
+| **W5** | Oct 05 – Oct 11 | Seed Code Audit & Design Decision Preparation | Task 1.2 Complete |
+| **W6** | Oct 12 – Oct 18 | Stakeholder Interviews (Oct 14–15), Architectural Decisions Trade Study & Requirements Finalization | Task 1.3 Complete |
 | **W7** | Oct 19 – Oct 25 | Timed `Receive` Implementation & Unit Test Suite | **Milestone 1 (Design Review 1)** |
 | **W8** | Oct 26 – Nov 01 | Protected Entry Barrier Hardening & Multi-Task Blocking Tests | Phase 2 Complete |
 | **W9** | Nov 02 – Nov 08 | Ring Buffer Drop-Oldest Verification & Property Tests | Tasks 3.1 & 3.2 Complete |
 | **W10** | Nov 09 – Nov 15 | Multi-Task Sustained Soak Stress Test & Jorvik Zero-Heap Audit | Tasks 3.3 & 3.4 Complete |
-| **W11** | Nov 16 – Nov 22 | Flight Telemetry Demo & Release Tagging | **Milestone 2 (`v0.1.0-inproc`)** |
-| **W12** | Nov 23 – Nov 29 | 14-Byte Wire Header Representation Clauses & CRC-32 Tests | Tasks 4.1 & 4.2 Complete |
+| **W11** | Nov 16 – Nov 22 | Flight Telemetry Demo, Subscriber Lifecycle & Registry Lockdown, Release Tagging | **Milestone 2 (`v0.1.0-inproc`)** |
+| **W12** | Nov 23 – Nov 29 | 14-Byte Wire Header Representation Clauses, CRC-32 Tests & Loopback Bridge Tests | Tasks 4.1, 4.2 & 4.2b Complete |
 | **W13** | Nov 30 – Dec 06 | GNAT.Sockets UDP Multicast Tuning & Bridge Tasks Integration | Tasks 4.3 & 4.4 Complete |
 | **W14** | Dec 07 – Dec 13 | Cross-Process Dual-Terminal Publishing & Headless CI Testing | **Milestone 3 (UDP Demo)** |
 | **W15** | Dec 14 – Dec 20 | Serial UART Transport (COBS) & Virtual Port Loopback Tests | **Milestone 4 (Design Review 2)** |
@@ -80,24 +82,26 @@ gantt
     Resolve Open Design Decisions                  :done, p1_3, 2026-10-05, 2026-10-18
 
     section P2: Timed Receive & Presentation (Oct 19 - Nov 01)
-    Implement Timed Receive in Topic Body          :active, p2_1, 2026-10-19, 2026-10-25
-    Timed Receive Unit Tests & Timeout Checks      :active, p2_2, 2026-10-19, 2026-10-25
+    Implement Timed Receive in Topic Body          :done, p2_1, 2026-10-19, 2026-10-25
+    Timed Receive Unit Tests & Timeout Checks      :done, p2_2, 2026-10-19, 2026-10-25
     Milestone 1 - Design Review Presentation 1     :milestone, m1, 2026-10-22, 0d
-    Harden Protected Queue Entry Barriers          :p2_3, 2026-10-26, 2026-11-01
-    Implement Multi-Task Blocking-Publish Test     :p2_4, 2026-10-26, 2026-11-01
+    Harden Protected Queue Entry Barriers          :done, p2_3, 2026-10-26, 2026-11-01
+    Implement Multi-Task Blocking-Publish Test     :active, p2_4, 2026-10-26, 2026-11-01
 
     section P3: In-Process Soak & Demo Release (Nov 02 - Nov 22)
-    Verify Best-Effort Drop-Oldest                 :p3_1, 2026-11-02, 2026-11-08
-    Drop-Oldest Invariant & Property Tests         :p3_2, 2026-11-02, 2026-11-08
+    Verify Best-Effort Drop-Oldest                 :done, p3_1, 2026-11-02, 2026-11-08
+    Drop-Oldest Invariant & Property Tests         :active, p3_2, 2026-11-02, 2026-11-08
     Multi-Task Sustained Soak Stress Test          :p3_3, 2026-11-09, 2026-11-15
     Zero-Heap & Embedded Jorvik Audit              :p3_4, 2026-11-09, 2026-11-15
     Expand Flight Telemetry Demo                   :p3_5, 2026-11-16, 2026-11-22
     Tag In-Process Release v0.1.0-inproc           :p3_6, 2026-11-16, 2026-11-22
+    Subscriber Lifecycle & Registry Lockdown       :p3_7, 2026-11-16, 2026-11-22
     Milestone 2 - In-Process Backend Demo          :milestone, m2, 2026-11-22, 0d
 
     section P4: Wire Protocol & UDP Prototype (Nov 23 - Dec 13)
     Wire Header Representation Clauses Layout      :p4_1, 2026-11-23, 2026-11-29
     Wire Framing & CRC-32 Unit Test Suite          :p4_2, 2026-11-23, 2026-11-29
+    Loopback Transport & Bridge Tests              :p4_2b, 2026-11-23, 2026-11-29
     GNAT.Sockets UDP Multicast Transport Tuning    :p4_3, 2026-11-30, 2026-12-06
     Bridge Egress & Ingress Task Integration       :p4_4, 2026-11-30, 2026-12-06
     Implement Cross-Process UDP Publish-Receive    :p4_5, 2026-12-07, 2026-12-13
