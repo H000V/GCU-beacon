@@ -36,8 +36,18 @@ but with more friction.
 
 `Empty_Queue` is the only well-formed initial value. `Buffer` is left
 uninitialized on purpose (`Element_Type` may have no default); only
-slots between `Head` and `Tail` are ever read. The proof will need
-`Relaxed_Initialization` on `Buffer` to say that precisely.
+slots between `Head` and `Tail` are ever read. The buffer's array type
+carries `Relaxed_Initialization`, and the type invariant says exactly
+that: `Tail = (Head + Fill) mod Depth`, and the `Fill` slots starting at
+`Head` are initialized. Index arithmetic goes through `Add`, which wraps
+without the intermediate overflow `(Head + Fill) mod Depth` would hit
+when `Depth` is near `Positive'Last`.
+
+GNATprove does not analyze a generic, only its instances. `prove/`
+instantiates `Beacon.Queue` with a `Depth` whose value is hidden from
+the prover, so `gnatprove -P prove/prove.gpr --mode=all` proves the
+queue for every `Depth` (71 checks, all proved; run in CI). FIFO order
+of the elements is covered by `queue_tests`, not by the proof.
 
 ## Delivery modes
 
@@ -119,5 +129,10 @@ representation clause.
 - Retransmission. A reliable transport over UDP is a project in itself;
   do the honest measurement first.
 - An embedded network transport. `BEACON_NETWORK=no` gives the core
-  on any runtime with protected entries (light tasking or full). ZFP
-  cannot host `Beacon.Topic`; use `Beacon.Queue` directly there.
+  on a full tasking runtime. Light tasking is the goal but not there
+  yet: `Beacon.Topic` currently fails the Jorvik profile (its entry
+  barriers call functions, which `Pure_Barriers` forbids, and the timed
+  `Receive` uses a `select ... or delay`, which `No_Select_Statements`
+  forbids) and Ravenscar as well (two entries per protected object).
+  Task 3.4 owns that. ZFP cannot host `Beacon.Topic`; use
+  `Beacon.Queue` directly there.

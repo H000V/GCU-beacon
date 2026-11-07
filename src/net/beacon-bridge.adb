@@ -89,8 +89,8 @@ package body Beacon.Bridge is
                Deserialize (Payload (1 .. PL), Msg, Valid);
                if Valid then
                   --  Try, not block: a stuck local subscriber must not
-                  --  stall the network reader. Reliable subscribers see
-                  --  this as Delivered = False on their side of the log.
+                  --  stall the network reader. A full Reliable subscriber
+                  --  silently misses Msg: Accepted is not counted yet.
                   Local.Try_Publish (Pub, Msg, Accepted);
                else
                   Rejected := Rejected + 1;

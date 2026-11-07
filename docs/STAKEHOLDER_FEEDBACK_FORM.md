@@ -54,8 +54,8 @@ Based on the stakeholder feedback gathered from Olivier Henley and Steven Faulkn
 
 2. **Subscriber Receive Procedure with Timeout:**
    Currently, the `Receive` procedure for Subscribers has no timeout and remains pending until data is received. This requirement will be implemented by maintaining two `Receive` procedures:
-   - The existing blocking procedure without a timeout: `procedure Receive (S : in out Subscriber; Item : out Element_Type);`
-   - A new timed procedure that accepts a timeout parameter: `procedure Receive (S : in out Subscriber; Item : out Element_Type; Timeout : Ada.Real_Time.Time_Span; Success : out Boolean);`
+   - The existing blocking procedure without a timeout: `procedure Receive (S : in out Subscriber; Msg : out Message_Type);`
+   - A new timed procedure that accepts a timeout parameter: `procedure Receive (S : in out Subscriber; Msg : out Message_Type; Timeout : Ada.Real_Time.Time_Span; Success : out Boolean);`
 
 3. **Publisher Registration Lockdown:**
    Currently, Publisher Registration is not task-safe and must occur before any `Publish` action. Rather than converting the registry into a protected object for dynamic runtime registration, the team will test locking down the publishers list after proper system initialization (during pre-flight elaboration and before any data is published), ensuring that no unauthorized third-party Publishers can be created.

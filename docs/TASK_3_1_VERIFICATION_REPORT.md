@@ -5,7 +5,7 @@
 **Task Identifier:** Task 3.1 (Phase 3: In-Process Soak & Demo Release)  
 **Lead Engineers:** Hovan Hodges (Core Systems Engineer) & Ryan Tomasko (Security & Validation Engineer)  
 **Reporting Date:** Week 9 (November 04, 2026)  
-**Status:** **Completed & Formally Verified**
+**Status:** **Completed.** Machine-checked GNATprove proof added 11/06/2026 (see §7).
 
 ---
 
@@ -17,7 +17,7 @@ Task 3.1 mandates the formal and empirical verification of the ring buffer overw
 3. The drop condition (`Dropped = True`) correlates strictly with buffer saturation ($\text{Count} = \text{Depth}$), preventing dropped-message miscounts or silent omissions.
 4. The pointer transitions cannot induce memory corruption, buffer overruns, uninitialized reads, or runtime constraint violations under the Ada 2022 compiler with assertions enabled (`-gnata`).
 
-This verification task has successfully integrated an explicit Ada `Type_Invariant` aspect on `Queue_Type`, embedded defensive assertions across all mutator subprograms, executed SPARK flow analysis with zero defects, and validated runtime adherence through unit, topic, and demo pipelines. Test harness expansion is formally decoupled and transitioned to **Task 3.2** (Drop-Oldest Invariant & Property Tests).
+This verification task has successfully integrated an explicit Ada `Type_Invariant` aspect on `Queue_Type`, embedded defensive assertions across all mutator subprograms, executed SPARK flow analysis (later found to be vacuous for the generic queue, see §7), and validated runtime adherence through unit, topic, and demo pipelines. Test harness expansion is formally decoupled and transitioned to **Task 3.2** (Drop-Oldest Invariant & Property Tests).
 
 ---
 
@@ -141,6 +141,7 @@ In accordance with architectural review, the following enhancements have been in
    type Queue_Type is private
      with Type_Invariant => Invariant (Queue_Type);
    ```
+   *Superseded 11/06/2026:* SPARK only accepts `Type_Invariant` on the full view, so the aspect now sits on the record in the private part. See §7.
 3. **Expression Completion in Private Part:**
    ```ada
    function Invariant (Q : Queue_Type) return Boolean is
@@ -159,7 +160,8 @@ In accordance with architectural review, the following enhancements have been in
 
 ### 5.2 SPARK Static Flow Analysis
 * **Command Executed:** `gnatprove -P beacon.gpr --mode=flow`
-* **Result:** Passed with 0 errors, 0 checks failed, 0 warnings, and 0 unproved dependencies. All data and information flows verified.
+* **Result as reported on 11/04:** 0 errors, 0 checks failed, 0 warnings.
+* **Correction (11/06/2026):** this result covered nothing in `Beacon.Queue`. GNATprove does not analyze generic units, only their instances, and `beacon.gpr` contains no instance; its summary reads "generic unit is not analyzed" for `beacon-queue`. See §7 for the real proof.
 
 ### 5.3 In-Process Pipeline Verification
 The entire runtime suite was re-executed with active invariant enforcement (`-gnata`):
@@ -173,7 +175,7 @@ The entire runtime suite was re-executed with active invariant enforcement (`-gn
    * Validated wire framing, CRC-32 checksums, and corruption rejection.
    * **Result:** `all passed` (0 failures).
 4. **`inproc_demo.exe`:**
-   * Executed 2,000 ms dual-task soak with 1 kHz Sensor publisher and 100 Hz Command publisher against a 100 Hz throttled consumer.
+   * Executed 2,000 ms dual-task soak with 1 kHz Sensor publisher and 10 Hz Command publisher against a 100 Hz throttled consumer.
    * **Statistics Recorded:**
      * Temperature (Best-Effort): Published 1,991 | Received 161 | Dropped 1,830 | Last Sequence 1,991 (Newest Preserved).
      * Command (Reliable): Published 20 | Received 20 | Dropped 0.
@@ -187,3 +189,40 @@ The entire runtime suite was re-executed with active invariant enforcement (`-gn
 With the mathematical proof and pointer arithmetic invariant verified and enforced at language level in Task 3.1, the project is positioned for **Task 3.2: Drop-Oldest Invariant & Property Tests**:
 * Task 3.2 will implement property-based randomized test generators to stress test ring buffer wrap-around, head/tail consistency, and FIFO sequence preservation over millions of pseudo-random operations.
 * Hand-off lead: Ryan Tomasko (Security & Validation Engineer).
+
+---
+
+## 7. Addendum (11/06/2026): Machine-Checked Proof with GNATprove
+
+The §5.2 flow run was vacuous (see the correction there). Running GNATprove on an actual instance of `Beacon.Queue` exposed three problems, all now fixed:
+
+1. **`Type_Invariant` on the partial view is not SPARK** (SPARK RM 7.3.2(2)). The instance was rejected outright. The aspect now sits on the full record declaration in the private part, written directly on the components, because SPARK does not let an invariant call a boundary function of its own type.
+2. **The uninitialized `Buffer` is not SPARK without `Relaxed_Initialization`** (SPARK RM 4.3(1), the `Buffer => <>` in `Empty_Queue`). The element array type now carries `Relaxed_Initialization`, and the invariant states which slots are initialized:
+   ```ada
+   with Type_Invariant =>
+     Tail = Add (Head, Fill)
+     and then (for all K in 0 .. Fill - 1 => Buffer (Add (Head, K))'Initialized);
+   ```
+3. **`(Head + Fill) mod Depth` can overflow** when `Depth > Natural'Last / 2`, and so could the `Count (Q'Old) + 1` in `Push_Dropping_Oldest`'s postcondition when `Depth = Natural'Last`. `Add (I, K)` computes `(I + K) mod Depth` without an intermediate overflow. The postcondition is now `Count (Q) = (if Dropped then Depth else Count (Q'Old) + 1)`, which means the same thing.
+
+Ghost assertions in `Pop` and `Push_Dropping_Oldest` guide the provers through the head shift used in §2.3.3 and §2.3.4 (`Add (Head', K) = Add (Head, K + 1)`).
+
+**Harness.** `prove/prove.gpr` instantiates the queue as `Integer_Queue`, with `Depth => Proof_Depth.Arbitrary`, a function whose body is hidden from the prover. The proof therefore holds for every `Depth` from 1 to `Positive'Last`, not just for one value.
+
+**Command and result:**
+```
+gnatprove -P prove/prove.gpr -XBEACON_NETWORK=no --mode=all
+Success: all checks proved (71 checks).
+```
+
+| Category | Checks | Result |
+| :--- | :---: | :--- |
+| Initialization | 3 | proved (flow 2, Z3 1) |
+| Run-time checks | 42 | proved |
+| Assertions | 6 | proved |
+| Functional contracts | 14 | proved |
+| Termination | 6 | proved (flow) |
+
+This is SPARK **Silver** (absence of runtime errors), plus the ring invariant and the `Count`, `Dropped` and fill-level contracts from §3.1. It does **not** prove that elements come out in FIFO order (§1, objective 1). That remains covered by `queue_tests` and is a candidate for Gold-level work in the spring phase. CI now runs this proof in place of the flow-only step.
+
+All tests and `inproc_demo` pass with the revised queue.

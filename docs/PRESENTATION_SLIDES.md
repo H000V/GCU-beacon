@@ -70,7 +70,7 @@ flowchart TD
     TeamNode["Beacon Team"]
     Hovan["<b>Hovan (Core Engineer)</b><br/>• Generic Topics & Bounded Queues<br/>• SPARK Formally Verified Ring"]
     Praise["<b>Praise (Network Engineer)</b><br/>• 14-Byte Wire Framing (Rep Clauses)<br/>• UDP Multicast & Serial Bridge"]
-    Ryan["<b>Ryan (Security Engineer)</b><br/>• Publisher Registry Lockdown<br/>• AUnit Harness & Soak Testing"]
+    Ryan["<b>Ryan (Security Engineer)</b><br/>• Publisher Registry Lockdown<br/>• Ada Unit Test Executables & Soak Testing"]
 
     Sponsor --> TeamNode
     Supply --> TeamNode
@@ -119,7 +119,7 @@ flowchart TD
 * **02. Dual Subscriber Receive API (Steven Faulkner, GCU)**  
   *Add `Ada.Real_Time` Timed Receive alongside blocking entry.* Provide non-blocking / timeout capabilities to prevent task starvation while preserving deterministic blocking behavior.
 * **03. Publisher Registry Lockdown (Steven Faulkner, GCU)**  
-  *Lock registry post-elaboration against rogue tasks.* Enforce strict elaboration-time registration so third-party unauthorized tasks cannot inject rogue publishers at runtime.
+  *Lock registry post-elaboration against rogue tasks.* Publisher lockdown is enforced today (a second publisher is refused), so third-party unauthorized tasks cannot inject rogue publishers at runtime; elaboration-time registration is a documented rule, and locking the registry after the first `Publish` is planned.
 * **04. Configurable Try_Publish Policy (Steven Faulkner, GCU)**  
   *Select `Partial_Delivery` or `All_Or_Nothing` equilibrium.* Provide explicit control over whether multi-subscriber fan-outs tolerate partial delivery or abort on full subscriber queues.
 
@@ -138,7 +138,7 @@ flowchart TD
 | **FR-05** | **Bounded FIFO Ring Queue** | 0 bytes heap in `src/` | Ada Jorvik / SPARK Silver proof |
 | **FR-06** | **Timed Receive Operation** | Timeout $\ge 1\ \mu\text{s}$ | POSIX PSE51 / Delayed pub test |
 | **FR-07** | **Publisher Registry Lockdown** | 0 post-init registrations | FACE TSS / Security injection test |
-| **FR-08** | **Configurable Try_Publish** | 2 selectable policies | DDS Coherent Set / Mode test |
+| **FR-08** | **Configurable Try_Publish (Planned)** | 2 selectable policies | DDS Coherent Set / Mode test |
 
 ---
 
@@ -172,7 +172,7 @@ package Temperature_Topic is new Beacon.Topic
 
 ```
 +=========================================================================================+
-| [Sensor Task 1 kHz] === Direct Protected Entry Fan-Out (Registry LOCKED) ===>           |
+| [Sensor Task 1 kHz] === Direct Protected Entry Fan-Out (Publisher LOCKED) ===>          |
 |                                                                                         |
 |       +------------------------------------+    +-------------------------------------+ |
 |       | Left: Sub 1 RELIABLE               |    | Right: Sub 2 BEST_EFFORT            | |
@@ -183,7 +183,7 @@ package Temperature_Topic is new Beacon.Topic
 ```
 
 #### Key Assumptions & Proof Model
-* **Static Bounds & Lockdown:** Pre-flight elaboration locks subscriber registry against rogue writers.
+* **Static Bounds & Lockdown:** Second publisher refused; pre-flight registration is a documented rule (registry lock after first `Publish` planned).
 * **Reliable Entry Barrier:** Closed barrier blocks producer upon queue saturation (`Dropped = 0`).
 * **Relaxed Ring Proof:** GNATprove verifies valid `Head`-to-`Tail` reads using `Relaxed_Initialization`.
 
@@ -245,7 +245,7 @@ package Temperature_Topic is new Beacon.Topic
 ### Application of Industry Standards
 
 * **ISO/IEC 8652:2023 Jorvik:** Ceiling Priority Protocol guarantees bounded execution time and eliminates priority inversion.
-* **IEEE 802.3-2022 CRC-32:** Polynomial `0xEDB88320` mathematically validates packed 14-byte wire headers.
+* **IEEE 802.3-2022 CRC-32:** Polynomial `0xEDB88320` mathematically validates the packed 14-byte wire header plus payload.
 * **UDP RFC 768 & Multicast RFC 1112:** Deterministic datagram sockets bridge isolated OS desktop processes.
 * **Open Group FACE TSS 3.1:** Generic Ada interfaces decouple application components from underlying transport layers.
 * **NASA cFE & CCSDS SOIS:** Strongly typed `Telemetry.Reading` replaces untyped C-based flight software buses.

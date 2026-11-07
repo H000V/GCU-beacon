@@ -24,7 +24,8 @@ worth doing in Ada:
   (Best_Effort)` drops its oldest and counts it. `Dropped` is always 0 on
   a Reliable subscriber; that is the checkable form of the promise.
 - **Bounded everywhere.** Queue depth and subscriber count are generic
-  parameters. No heap in `src/`. `Beacon.Queue` is SPARK.
+  parameters. No heap in `src/`. `Beacon.Queue` is SPARK and proved
+  (see `prove/`).
 
 ## What is in the seed
 
@@ -43,7 +44,8 @@ demo/telemetry-codecs        Serialize/Deserialize by overlay of a rep-claused r
 demo/inproc_demo             1 kHz sensor + 10 Hz controller, checks both modes, exits non-zero on failure
 demo/net_publisher           200 readings over UDP ...
 demo/net_subscriber          ... received, CRC-checked, sequence gaps counted
-tests/                       queue (wrap, drop-oldest), topic (fan-out, overflow), wire (CRC vector, rejects)
+tests/                       queue (wrap, drop-oldest), topic (fan-out, overflow, timed receive), wire (CRC vector, rejects)
+prove/                       GNATprove harness: proves Beacon.Queue for every Depth
 ```
 
 `BEACON_NETWORK=no` drops `src/net/` for targets without sockets.
@@ -52,10 +54,13 @@ Read `ARCHITECTURE.md` before touching anything.
 
 ## Milestones
 
-1. **Prove `Beacon.Queue`.** `gnatprove --mode=all` clean: the ring
-   index arithmetic never leaves the array, `Fill` stays in range,
-   drop-oldest keeps head and tail consistent. Small package, first
-   real proof. Expect to add `Relaxed_Initialization` on `Buffer`.
+1. **Prove `Beacon.Queue`.** Done (Week 9). `gnatprove --mode=all` on
+   `prove/prove.gpr` proves all 71 checks for an arbitrary `Depth`: the
+   ring index arithmetic never leaves the array or overflows, `Fill`
+   stays in range, and the type invariant (`Tail = (Head + Fill) mod
+   Depth`, with exactly the live slots initialized, via
+   `Relaxed_Initialization`) holds after every operation. FIFO order of
+   the elements is tested, not yet proved.
 2. **Blocking semantics under load.** A test where a Reliable subscriber
    is full, the publisher blocks in `Publish`, and unblocks when the
    subscriber drains. Then a sustained load test: N tasks, minutes,
@@ -73,15 +78,19 @@ Read `ARCHITECTURE.md` before touching anything.
 
 1. `Try_Publish` on a full Reliable subscriber: partial delivery
    (current: the others get it, `Delivered = False`) or all-or-nothing.
+   *Still open in code*: a configurable mode was discussed with the
+   stakeholders but is not implemented.
 2. Registration is not task-safe and must precede any `Publish`. Keep
    as a documented rule (current), or make the registry a protected
    object. The in-process demo shows what happens when you get this
-   wrong: it waits on a `Go` entry before publishing.
-3. `Receive` blocks with no timeout. Keep, or add `Receive (S, Msg,
-   Timeout, Success)`.
+   wrong: it waits on a `Go` entry before publishing. *Still open*:
+   only a second `Create_Publisher` is refused today.
+3. ~~`Receive` blocks with no timeout.~~ *Closed (Week 8)*: added
+   `Receive (S, Msg, Timeout, Success)`. Note that it uses a timed
+   entry call, which the Ravenscar and Jorvik profiles forbid.
 4. Registry holds `Subscriber'Unchecked_Access`: a subscriber declared
    in a scope that exits leaves a dangling entry. Acceptable with the
-   "declare at library level" rule, or redesign.
+   "declare at library level" rule, or redesign. *Still open.*
 
 ## Build
 
@@ -96,8 +105,12 @@ cd demo  && alr build && ./bin/inproc_demo
 # two terminals:
 ./bin/net_subscriber 239.255.0.1 5000 5
 ./bin/net_publisher  239.255.0.1 5000 1000
-alr with gnatprove && alr exec -- gnatprove -P beacon.gpr --mode=flow
+# proof (alr with adds gnatprove to alire.toml; `alr install gnatprove` avoids that)
+alr with gnatprove && alr exec -- gnatprove -P prove/prove.gpr -XBEACON_NETWORK=no --mode=all
 ```
+
+GNATprove skips generic units, so `gnatprove -P beacon.gpr` analyzes
+nothing in `Beacon.Queue`. Always prove through `prove/prove.gpr`.
 
 Contracts are checked at runtime in every build (`-gnata`). Warnings
 are errors.
@@ -123,4 +136,5 @@ project Discord.
 
 ## License
 
-Apache-2.0. See `LICENSE`.
+Apache-2.0. See `LICENSE` for the full text and `NOTICE` for the
+copyright notice.

@@ -13,8 +13,10 @@
 --  Single writer: one Publisher per instantiation. Create_Publisher
 --  refuses a second one.
 --
---  Runtime needs: protected types with entries, so light-tasking
---  (Ravenscar / Jorvik) or full. Not ZFP. On ZFP use Beacon.Queue directly.
+--  Runtime needs: full tasking today. Not Jorvik yet: the entry
+--  barriers call functions (Pure_Barriers) and the timed Receive uses a
+--  select with a delay (No_Select_Statements). Not Ravenscar either (two
+--  entries per protected object). Not ZFP. On ZFP use Beacon.Queue directly.
 
 with Ada.Real_Time;
 with Beacon.Queue;

@@ -22,9 +22,9 @@
 --  record with a representation clause (design rule 6), not hand-packing.
 --
 --  One egress and one ingress per instantiation, each a task started
---  on demand. Stop asks both to finish; they exit after their current
---  Receive returns (Ingress polls with a 100 ms timeout, Egress after
---  the next local message, so publish one or accept the delay).
+--  on demand. Stop asks both to finish; they exit at their next poll
+--  (Ingress polls the transport with a 100 ms timeout, Egress polls its
+--  local subscriber every 1 ms).
 
 with Beacon.Topic;
 with Beacon.Wire;

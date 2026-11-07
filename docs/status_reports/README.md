@@ -13,8 +13,8 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **SR-02** | **Week 5** | 10/11/2026 | **3%** | Seed repository architecture audit, project charter formulation, roles & responsibilities finalization, and initial research into SPARK verification. | [`STATUS_REPORT_02_OCT_11.md`](STATUS_REPORT_02_OCT_11.md) |
 | **SR-03** | **Week 6** | 10/18/2026 | **5%** | Stakeholder consultations with Olivier Henley (AdaCore) and Steven Faulkner (GCU), requirements matrix formulation, and Design Review 1 preparation. | [`STATUS_REPORT_03_OCT_18.md`](STATUS_REPORT_03_OCT_18.md) |
 | **SR-04** | **Week 7** | 10/25/2026 | **7%** | Successful delivery of **Milestone 1: Design Review Presentation 1**, team roster consolidation (Ryan Tomasko assumes Validation role), and kickoff of Timed `Receive`. | [`STATUS_REPORT_04_OCT_25.md`](STATUS_REPORT_04_OCT_25.md) |
-| **SR-05** | **Week 8** | 11/01/2026 | **10%** | Implementation and unit test verification of timed `Receive` (Tasks 2.1 & 2.2), closure of Open Design Decision 3, and hardening protected entry barriers for Phase 2 completion. | [`STATUS_REPORT_05_NOV_01.md`](STATUS_REPORT_05_NOV_01.md) |
-| **SR-06** | **Week 9** | 11/08/2026 | **13%** | Hardening protected queue barriers with CPP (Task 2.3), formal inductive proof and Ada Type_Invariant verification for Best-Effort ring buffer drop-oldest arithmetic (Task 3.1). | [`STATUS_REPORT_06_NOV_08.md`](STATUS_REPORT_06_NOV_08.md) |
+| **SR-05** | **Week 8** | 11/01/2026 | **10%** | Implementation of timed `Receive` with its first unit tests (Task 2.1; Task 2.2 still in progress at report time), closure of Open Design Decision 3, and planning of protected entry barrier hardening for Phase 2 completion. | [`STATUS_REPORT_05_NOV_01.md`](STATUS_REPORT_05_NOV_01.md) |
+| **SR-06** | **Week 9** | 11/08/2026 | **13%** | Hardening protected queue barriers with CPP (Task 2.3), formal inductive proof and Ada Type_Invariant verification for Best-Effort ring buffer drop-oldest arithmetic (Task 3.1), then a full GNATprove proof of `Beacon.Queue` (71/71 checks). | [`STATUS_REPORT_06_NOV_08.md`](STATUS_REPORT_06_NOV_08.md) |
 
 ---
 
@@ -38,14 +38,24 @@ This directory catalogs the weekly progress updates and status reports submitted
 | Ada 2022 & SPARK Language Learning     Week 4 (1%)    Monitored        Ongoing study of Ada RM  |
 | Curve & Verification Complexity                                        and AdaCore tutorials.   |
 |-------------------------------------------------------------------------------------------------|
-| Open Design Ambiguities (Receive       Week 5 (3%)    Resolved         Mentor consultations on  |
-| timeouts, registry lockdown, try-pub)                                  10/14 & 10/15 closed all |
-|                                                                        architectural decisions. |
+| Open Design Ambiguities (Receive       Week 5 (3%)    Partially        Mentor consultations on  |
+| timeouts, registry lockdown, try-pub)                 Resolved         10/14 & 10/15 set the    |
+|                                                                        direction. Timed Receive |
+|                                                                        is implemented; registry |
+|                                                                        lockdown, configurable   |
+|                                                                        Try_Publish and dangling |
+|                                                                        subscriber access remain |
+|                                                                        open in code.            |
 |-------------------------------------------------------------------------------------------------|
 | Team Member Withdrawal & Roster        Week 7 (7%)    Resolved         Team consolidated into   |
 | Transition                                                             3-member structure; Ryan |
 |                                                                        Tomasko assumed all      |
 |                                                                        Validation duties.       |
+|-------------------------------------------------------------------------------------------------|
+| Embedded Profile & Zero-Heap           Week 6 (5%)    Active           Week 9 trial compile     |
+| Compliance (Jorvik)                                                    under Jorvik fails       |
+|                                                                        (Pure_Barriers, timed    |
+|                                                                        Receive). Task 3.4.      |
 |-------------------------------------------------------------------------------------------------|
 | Multi-Task Synchronization &           Week 8 (10%)   Mitigated        Ceiling Priority Protocol|
 | Protected Barrier Concurrency                                          in gnat.adc and priority |
@@ -76,3 +86,5 @@ This directory catalogs the weekly progress updates and status reports submitted
 * Work Breakdown Structure (WBS): [`docs/WORK_BREAKDOWN_STRUCTURE.md`](../WORK_BREAKDOWN_STRUCTURE.md)
 * 15-Week Gantt Schedule Grid: [`docs/GANTT_SCHEDULE_MATRIX.md`](../GANTT_SCHEDULE_MATRIX.md)
 * Stakeholder Feedback Form: [`docs/STAKEHOLDER_FEEDBACK_FORM.md`](../STAKEHOLDER_FEEDBACK_FORM.md)
+* Task 3.1 Verification Report: [`docs/TASK_3_1_VERIFICATION_REPORT.md`](../TASK_3_1_VERIFICATION_REPORT.md)
+* Mermaid Gantt Chart: [`docs/beacon.gantt`](../beacon.gantt)

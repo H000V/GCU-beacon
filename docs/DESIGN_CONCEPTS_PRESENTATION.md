@@ -22,7 +22,7 @@
 | **1** | Title & Project Organization | Project identity, GCU course, AdaCore GAP sponsorship & team roster | 0:45 | Hovan Hodges (Core) |
 | **2** | Sponsor & Target Users: AdaCore & Community | Overview of AdaCore, GAP sponsorship, and the two-phased user adoption model | 1:15 | Praise Jibunor (Network) |
 | **3** | Project Context & Purpose | Problem statement, ROS 2/DDS dynamic limits, safety-critical rationale | 1:15 | Hovan Hodges (Core) |
-| **4** | Team Structure & Engineering Ownership | Division of responsibilities across Core, Security, Validation & Network | 1:00 | Ryan Tomasko (Security & Validation) |
+| **4** | Team Structure & Engineering Ownership | Division of responsibilities across Core Systems, Security & Validation, and Network Systems | 1:00 | Ryan Tomasko (Security & Validation) |
 | **5** | Stakeholder Feedback Integration | Interviews with Olivier Henley (AdaCore) and Steven Faulkner (GCU) | 1:30 | Ryan Tomasko (Security & Validation) |
 | **6** | Functional Requirements & Measurement | 10 requirements mapped to customer feedback, standards & test metrics | 1:30 | Ryan Tomasko (Security & Validation) |
 | **7** | Concept 1 Overview: Static Generic Protected Queues | Current baseline: Compile-time types, bounded ring, Ada protected objects | 1:30 | Hovan Hodges (Core) |
@@ -170,7 +170,7 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 |   Ryan Tomasko                  |                              |  Praise Jibunor                 |
 |   Security & Validation Engineer|                              |  Network Systems Engineer       |
 |   Publisher Registry Lockdown   |                              |  14-Byte Wire Framing (Rep Cls) |
-|   AUnit Harness & Soak Testing  |                              |  IEEE 802.3 CRC-32 Validation   |
+|   Ada Unit Tests & Soak Testing |                              |  IEEE 802.3 CRC-32 Validation   |
 |   Injection & Memory Defense    |                              |  UDP Multicast & Serial Bridge  |
 +---------------------------------+                              +---------------------------------+
 ```
@@ -185,7 +185,7 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 >
 > Hovan Hodges, our Core Engineer, oversees the Ada generic specifications and SPARK proof contracts. Praise Jibunor, our Network Engineer, handles representation clauses for 14-byte wire framing, UDP multicast transport, and physical serial bridges.
 >
-> As Security & Validation Engineer, my responsibility is twofold: I lead our automated AUnit test harnesses and sustained concurrency stress testing, while ensuring our architecture eliminates unauthorized publisher registration, prevents payload tampering via CRC-32 checks, and guarantees memory boundary integrity. Together, we conduct weekly design reviews with Steven Faulkner and Olivier Henley."
+> As Security & Validation Engineer, my responsibility is twofold: I lead our automated Ada unit test executables and sustained concurrency stress testing, while ensuring our architecture eliminates unauthorized publisher registration, prevents payload tampering via CRC-32 checks, and guarantees memory boundary integrity. Together, we conduct weekly design reviews with Steven Faulkner and Olivier Henley."
 
 ---
 
@@ -217,8 +217,8 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 
 ### Detailed Design Solutions from Stakeholder Decisions
 * **Directive 1 (Dual Receive Procedures):** In [`src/beacon-topic.ads`](../src/beacon-topic.ads), the existing `procedure Receive (S, Msg)` blocks indefinitely. In response to Steven Faulkner's feedback, we are introducing `procedure Receive (S, Msg, Timeout, Success)` using `Ada.Real_Time.Time_Span`, preventing consumer thread starvation.
-* **Directive 2 (Publisher Registry Lockdown):** Rather than adding runtime overhead with a dynamic protected registry, we enforce that publisher registration is strictly executed during pre-flight elaboration. Once `Publish` is initiated, the registry enters a permanent locked state—mitigating third-party injection attacks.
-* **Directive 3 (Configurable `Try_Publish` Modes):** Certain aerospace subsystems require strict equilibrium across all control surfaces (if one fails to receive, none should process), whereas telemetry fan-outs tolerate partial drops. We are implementing an enumerated parameter:
+* **Directive 2 (Publisher Registry Lockdown):** Rather than adding runtime overhead with a dynamic protected registry, registration is a documented rule: it happens during pre-flight elaboration, from one task, before any `Publish`. Publisher lockdown is enforced today (`Create_Publisher` refuses a second publisher); locking the subscriber registry once `Publish` begins is proposed—mitigating third-party injection attacks.
+* **Directive 3 (Configurable `Try_Publish` Modes):** Certain aerospace subsystems require strict equilibrium across all control surfaces (if one fails to receive, none should process), whereas telemetry fan-outs tolerate partial drops. `Try_Publish` currently provides partial delivery only; we plan to add an enumerated parameter:
   ```ada
   type Try_Publish_Policy is (Partial_Delivery, All_Or_Nothing);
   ```
@@ -245,14 +245,14 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 | **FR-05** | **Bounded FIFO Ring Queues** | Queue depth $N \in [1, 65535]$; 0 heap allocation in `src/` | Charter Constraint / Henley | ISO/IEC 8652:2023 Annex D.13 (Jorvik) | GNATprove SPARK Silver formal mathematical proof |
 | **FR-06** | **Timed Receive Operation** | Timeout parameter $\ge 1\ \mu\text{s}$; unblocks on expiration | Faulkner Stakeholder Feedback | POSIX 1003.13 PSE51 & Ada Real-Time | Simulated delayed publisher asserting timeout return |
 | **FR-07** | **Publisher Registry Lockdown** | 0 publishers registered post-initialization; tamper immune | Faulkner & Security Audit | The Open Group FACE TSS Architecture | Attempting post-elaboration publisher creation |
-| **FR-08** | **Configurable Try_Publish** | Selectable `Partial_Delivery` vs. `All_Or_Nothing` mode | Faulkner Stakeholder Feedback | OMG DDS v1.4 Coherent Set QoS | Simulating 1 full subscriber among $N$ recipients |
+| **FR-08** | **Configurable Try_Publish (Planned)** | Selectable `Partial_Delivery` vs. `All_Or_Nothing` mode | Faulkner Stakeholder Feedback | OMG DDS v1.4 Coherent Set QoS | Simulating 1 full subscriber among $N$ recipients |
 | **FR-09** | **In-Process Throughput & Jitter** | Sensor rate $\ge 1{,}000\text{ Hz}$; Controller $\ge 10\text{ Hz}$; Latency $< 50\ \mu\text{s}$ | Systems Lead & Inproc Demo | NASA cFE & CCSDS SOIS Spaceflight | High-rate multi-task load test in `inproc_demo` |
 | **FR-10** | **Cross-Process Network Bridge** | Forwarding $\ge 200\text{ msg/s}$ over UDP multicast | Charter Deliverable / Praise | RFC 768 (UDP) & RFC 1112 (Multicast) | Dual-process loopback test measuring sequence gaps |
 
 ### Speaker Notes
 > "Slide 6 presents our comprehensive Functional Requirements Matrix, directly incorporating our coursework submissions. Every requirement is tied to stakeholder feedback, an industry standard, and a concrete measurement method.
 >
-> FR-01 mandates IEEE 802.3 CRC-32 frame integrity, measured by automated bit-flipping test vectors in `wire_tests`. FR-02 enforces strict compile-time type safety with zero untyped buffers. FR-03 and FR-04 reflect our single-publisher and reliable zero-drop requirements, aligned with OMG DDS QoS policies. FR-05 mandates bounded FIFO queues, measured by a SPARK Silver formal proof under the Ada Jorvik profile. Finally, requirements FR-06, FR-07, and FR-08 directly implement the timed receive, publisher lockdown, and configurable try-publish directives established during our mentor meetings."
+> FR-01 mandates IEEE 802.3 CRC-32 frame integrity, measured by automated bit-flipping test vectors in `wire_tests`. FR-02 enforces strict compile-time type safety with zero untyped buffers. FR-03 and FR-04 reflect our single-publisher and reliable zero-drop requirements, aligned with OMG DDS QoS policies. FR-05 mandates bounded FIFO queues, measured by a SPARK Silver formal proof under the Ada Jorvik profile. Finally, requirements FR-06, FR-07, and FR-08 directly capture the timed receive, publisher lockdown, and configurable try-publish directives established during our mentor meetings; FR-08 is planned."
 
 ---
 
@@ -317,9 +317,9 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 
 ### 1. Underlying Assumptions
 1. **Assumption C1-A1 (Static Participant Bounds):** Maximum subscriber count (`Max_Subscribers`) and queue depth (`Queue_Depth`) are statically known at compile time, precluding runtime heap allocation.
-2. **Assumption C1-A2 (Initialization Precedence & Lockdown):** All subscribers register during startup elaboration. The registry locks down before publishing begins, mitigating unauthorized third-party publisher creation.
+2. **Assumption C1-A2 (Initialization Precedence & Lockdown):** All subscribers register during startup elaboration, before publishing begins (a documented rule; registry lockdown after the first `Publish` is planned). Publisher lockdown is enforced today: `Create_Publisher` refuses a second publisher, mitigating unauthorized third-party publisher creation.
 3. **Assumption C1-A3 (Jorvik Profile Real-Time Tasking):** The underlying runtime supports Ada 2022 Protected Objects with entry queues and Ceiling Priority Protocol (ISO/IEC 8652:2023 Annex D.13).
-4. **Assumption C1-A4 (Relaxed Buffer Initialization):** Memory slots in the generic ring are uninitialized until populated; GNATprove flow analysis verifies that only slots between `Head` and `Tail` are read.
+4. **Assumption C1-A4 (Relaxed Buffer Initialization):** Memory slots in the generic ring are uninitialized until populated; GNATprove proof mode verifies that only slots between `Head` and `Tail` are read.
 
 ### 2. Narrative Description of the Sketch
 > *The sketch illustrates the physical memory topology and execution flow of Concept 1. At the top, the Sensor Task (producer) invokes `Publish(P, Msg)`. The call executes synchronously within the publisher's thread, executing direct fan-out calls to pre-registered subscribers without any intermediate broker task. The dispatch branches into two distinct protected queues. On the left, Subscriber 1 is configured with the `Reliable` discriminant: its entry barrier evaluates `Fill < Depth`. If the queue is saturated, the entry barrier remains closed, forcing the publisher task to wait and mathematically preserving the invariant `Dropped = 0`. On the right, Subscriber 2 is configured as `Best_Effort`: its entry barrier is unconditional (`True`). When full, the queue pushes out its oldest element, advancing the head pointer and incrementing the atomic drop counter. At the base, the Controller Task and Telemetry Logger independently drain messages via protected `Pop` operations or timed `Receive`.*
@@ -337,7 +337,7 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 |               v                                                                       |
 |   +-------------------------------------------------------------------------------+   |
 |   | IN-PROCESS DIRECT FAN-OUT (Executed within Publisher Thread Context)          |   |
-|   | Publisher Registry: LOCKED (Zero third-party dynamic registrations allowed)   |   |
+|   | Publisher: LOCKED (2nd refused); Subscriber registry lock: PLANNED            |   |
 |   +-------------------------------------------------------------------------------+   |
 |            |                                                         |                |
 |            | Protected Entry Call 1                                  | Entry Call 2   |
@@ -369,7 +369,7 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 ### Speaker Notes
 > "On Slide 8, Hovan and Ryan present the physical assumptions and concurrency sketch of Concept 1. Our design assumes fixed bounds at instantiation, completely eliminating dynamic heap allocation.
 >
-> In the sketch, observe the execution path: the Sensor Task invokes `Publish` directly within its own thread context, eliminating thread context-switch latency. For the Reliable subscriber on the left, if the buffer fills, the protected entry barrier closes, blocking the publisher and guaranteeing that drop counts remain zero. For the Best-Effort subscriber on the right, the barrier remains open: when full, pointer arithmetic overwrites the oldest sample and increments the drop counter. Notice also that following Steven Faulkner's feedback, the publisher registry is locked down, ensuring no unauthorized task can inject data into the topic."
+> In the sketch, observe the execution path: the Sensor Task invokes `Publish` directly within its own thread context, eliminating thread context-switch latency. For the Reliable subscriber on the left, if the buffer fills, the protected entry barrier closes, blocking the publisher and guaranteeing that drop counts remain zero. For the Best-Effort subscriber on the right, the barrier remains open: when full, pointer arithmetic overwrites the oldest sample and increments the drop counter. Notice also that following Steven Faulkner's feedback, publisher lockdown is enforced—a second publisher is refused—so no unauthorized task can inject data into the topic; locking the subscriber registry once publishing begins is planned."
 
 ---
 
@@ -547,7 +547,7 @@ Project Beacon leverages **Ada 2022** and **SPARK** to enforce safety at compile
 
 ### Direct Codebase Manifestation
 * **Jorvik Profile:** [`src/beacon-topic.ads`](../src/beacon-topic.ads#L95-L106) implements `Bounded_Queue` as a single-entry protected object.
-* **IEEE 802.3 CRC-32:** [`src/net/beacon-wire.ads`](../src/net/beacon-wire.ads#L66-L69) computes 32-bit checksums over packed 14-byte frames.
+* **IEEE 802.3 CRC-32:** [`src/net/beacon-wire.ads`](../src/net/beacon-wire.ads#L66-L69) computes 32-bit checksums over the packed 14-byte header (checksum field zeroed) plus payload (up to 1024 bytes).
 * **NASA cFE / CCSDS SOIS:** [`demo/src/telemetry.ads`](../demo/src/telemetry.ads#L14-L42) models aerospace spacecraft bus telemetry.
 
 ### Speaker Notes
@@ -585,7 +585,7 @@ OCTOBER 2026                 NOVEMBER 2026                DECEMBER 2026         
 3. **Phase 4 & 5 (Weeks 12–15: Nov 23 – Dec 20, 2026) — Network & Serial Transports:**
    * Lay out wire header representation clauses and tune UDP multicast socket bridge.
    * Architect point-to-point Serial UART transport with COBS stream framing.
-   * **Milestone Gate 3 & 4 (Dec 20):** Cross-process UDP demo and Fall Semester Transport Review.
+   * **Milestone Gates 3 & 4 (Dec 13 / Dec 18):** Cross-process UDP demo and Design Review 2.
 4. **Spring Semester (Weeks 16–32: Jan – Apr 2027) — SPARK Proof & Alire Packaging:**
    * Discharge 100% of GNATprove Silver verification conditions on [`src/beacon-queue.ads`](../src/beacon-queue.ads).
    * Package `adacore_beacon` for the Alire Community Index; conduct final Capstone Defense.
@@ -628,7 +628,7 @@ OCTOBER 2026                 NOVEMBER 2026                DECEMBER 2026         
 * **Q1: "Why choose compile-time static generic topics over runtime dynamic discovery?"**  
   * *Response (Hovan Hodges):* Dynamic discovery requires runtime string parsing, hash maps, and heap allocation, which introduce non-deterministic jitter and prevent DO-178C Level A certification. In safety-critical aerospace and spaceflight systems (such as NASA cFE architectures), communications topology is known at design time; compile-time static generic instantiation eliminates discovery overhead and guarantees complete predictability.
 * **Q2: "How does the system prevent third-party rogue tasks from publishing on sensitive topics?"**  
-  * *Response (Ryan Tomasko):* Following our stakeholder meeting with Steven Faulkner, we rejected dynamic protected registries in favor of an initialization lockdown rule. All publishers and subscribers must be instantiated during pre-flight elaboration. Once publishing begins, the registry is locked, preventing unauthorized third-party tasks from creating rogue publishers.
+  * *Response (Ryan Tomasko):* Following our stakeholder meeting with Steven Faulkner, we rejected dynamic protected registries in favor of an initialization lockdown rule. All publishers and subscribers must be instantiated during pre-flight elaboration, before any `Publish`; today this is a documented rule. Publisher lockdown is enforced: `Create_Publisher` refuses a second publisher, preventing unauthorized third-party tasks from creating rogue publishers. Locking the registry once publishing begins is planned.
 * **Q3: "How do you verify that the uninitialized queue buffer does not leak garbage data?"**  
   * *Response (Hovan Hodges):* Because generic message types in Ada may lack default initialization, `Beacon.Queue` leaves unpopulated slots uninitialized. We apply SPARK's `Relaxed_Initialization` aspect and prove invariants `Tail = (Head + Fill) mod Depth`, mathematically guaranteeing through GNATprove that the system only reads valid slots between `Head` and `Tail`.
 * **Q4: "Who is the primary commercial sponsor, and what is AdaCore's stake in this capstone?"**  
