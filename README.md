@@ -44,7 +44,8 @@ demo/telemetry-codecs        Serialize/Deserialize by overlay of a rep-claused r
 demo/inproc_demo             1 kHz sensor + 10 Hz controller, checks both modes, exits non-zero on failure
 demo/net_publisher           200 readings over UDP ...
 demo/net_subscriber          ... received, CRC-checked, sequence gaps counted
-tests/                       queue (wrap, drop-oldest), topic (fan-out, overflow, timed receive), wire (CRC vector, rejects)
+tests/                       queue (wrap, drop-oldest), topic (fan-out, overflow), topic_timed (receive with timeout), wire (CRC vector, rejects)
+jorvik/                      builds and runs a Beacon.Topic instance under pragma Profile (Jorvik), no heap, no secondary stack
 prove/                       GNATprove harness: proves Beacon.Queue for every Depth
 ```
 
@@ -86,8 +87,11 @@ Read `ARCHITECTURE.md` before touching anything.
    wrong: it waits on a `Go` entry before publishing. *Still open*:
    only a second `Create_Publisher` is refused today.
 3. ~~`Receive` blocks with no timeout.~~ *Closed (Week 8)*: added
-   `Receive (S, Msg, Timeout, Success)`. Note that it uses a timed
-   entry call, which the Ravenscar and Jorvik profiles forbid.
+   `Receive (S, Msg, Timeout, Success)`. It uses a timed entry call,
+   which the Ravenscar and Jorvik profiles forbid, so since Task 3.4
+   it is in the child package `Beacon.Topic.Timed`
+   (`package T_Timed is new T.Timed;`). The core `Beacon.Topic`
+   compiles under Jorvik.
 4. Registry holds `Subscriber'Unchecked_Access`: a subscriber declared
    in a scope that exits leaves a dangling entry. Acceptable with the
    "declare at library level" rule, or redesign. *Still open.*
@@ -100,7 +104,9 @@ library by path.
 ```
 alr build                           # library, with src/net
 BEACON_NETWORK=no alr build         # library, in-process only
-cd tests && alr build && ./bin/queue_tests && ./bin/topic_tests && ./bin/wire_tests
+cd tests && alr build && ./bin/queue_tests && ./bin/topic_tests && ./bin/topic_timed_tests && ./bin/wire_tests
+# Jorvik profile and zero-heap check of the core
+alr exec -- gprbuild -P jorvik/jorvik.gpr && ./jorvik/bin/jorvik_check
 cd demo  && alr build && ./bin/inproc_demo
 # two terminals:
 ./bin/net_subscriber 239.255.0.1 5000 5

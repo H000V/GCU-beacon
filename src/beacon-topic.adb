@@ -1,5 +1,3 @@
-with Ada.Real_Time; use Ada.Real_Time;
-
 package body Beacon.Topic is
 
    -------------------
@@ -8,8 +6,16 @@ package body Beacon.Topic is
 
    protected body Bounded_Queue is
 
+      --  Call after every change to Q, so the barriers stay correct.
+      procedure Refresh_Flags;
+      procedure Refresh_Flags is
+      begin
+         Full  := Ring.Is_Full (Q);
+         Empty := Ring.Is_Empty (Q);
+      end Refresh_Flags;
+
       entry Push (Msg : Message_Type)
-        when Mode = Best_Effort or else not Ring.Is_Full (Q)
+        when Mode = Best_Effort or else not Full
       is
          Dropped : Boolean;
       begin
@@ -21,6 +27,7 @@ package body Beacon.Topic is
          else
             Ring.Push (Q, Msg);
          end if;
+         Refresh_Flags;
       end Push;
 
       procedure Try_Push (Msg : Message_Type; Accepted : out Boolean) is
@@ -38,11 +45,13 @@ package body Beacon.Topic is
             Ring.Push (Q, Msg);
             Accepted := True;
          end if;
+         Refresh_Flags;
       end Try_Push;
 
-      entry Pop (Msg : out Message_Type) when not Ring.Is_Empty (Q) is
+      entry Pop (Msg : out Message_Type) when not Empty is
       begin
          Ring.Pop (Q, Msg);
+         Refresh_Flags;
       end Pop;
 
       procedure Try_Pop (Msg : out Message_Type; Success : out Boolean) is
@@ -50,6 +59,7 @@ package body Beacon.Topic is
          Success := not Ring.Is_Empty (Q);
          if Success then
             Ring.Pop (Q, Msg);
+            Refresh_Flags;
          end if;
       end Try_Pop;
 
@@ -123,25 +133,6 @@ package body Beacon.Topic is
    procedure Receive (S : in out Subscriber; Msg : out Message_Type) is
    begin
       S.Queue.Pop (Msg);
-   end Receive;
-
-   procedure Receive
-     (S       : in out Subscriber;
-      Msg     : out Message_Type;
-      Timeout : Ada.Real_Time.Time_Span;
-      Success : out Boolean) is
-   begin
-      if Timeout <= Time_Span_Zero then
-         S.Queue.Try_Pop (Msg, Success);
-      else
-         select
-            S.Queue.Pop (Msg);
-            Success := True;
-         or
-            delay until Clock + Timeout;
-            Success := False;
-         end select;
-      end if;
    end Receive;
 
    procedure Try_Receive

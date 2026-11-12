@@ -155,7 +155,7 @@ flowchart LR
 
 * **Task 3.4: Zero-Heap & Embedded Jorvik Audit**
   * **Lead Engineer:** Hovan Hodges (Core Systems Engineer)
-  * **Description:** Profile core memory footprint using `gnatmem` and verify zero dynamic allocation in `src/` to ensure full compliance with the Ada Jorvik profile.
+  * **Description:** Profile core memory footprint using `gnatmem` and verify zero dynamic allocation in `src/` to ensure full compliance with the Ada Jorvik profile. **Code complete (11/12/2026):** the core builds and runs under `pragma Profile (Jorvik)` with `No_Allocators`, `No_Implicit_Heap_Allocations` and `No_Secondary_Stack` ([`jorvik/jorvik.gpr`](../jorvik/jorvik.gpr), in CI). `gnatmem` was not available, so compile-time restrictions replace it; nothing was run on an embedded runtime (see [`docs/TASK_3_4_VERIFICATION_REPORT.md`](TASK_3_4_VERIFICATION_REPORT.md)).
   * **Resources Required:** GNAT Jorvik embedded runtime; `gnatmem` heap profiling utility; `-fstack-check` compiler diagnostics; [`beacon.gpr`](../beacon.gpr); Visual Studio Code.
   * **Time Needed:** 24 hours (re-baselined from 16 on 11/06/2026) | **Duration:** 1 week (Nov 09 – Nov 15, 2026).
   * **Costs Associated:** \$0.

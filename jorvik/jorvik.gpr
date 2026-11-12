@@ -1,0 +1,31 @@
+--  Jorvik profile and zero-heap check for the core (Task 3.4).
+--
+--  A generic is only fully checked when it is instantiated, so compiling
+--  beacon.gpr under the profile would not see the entry barriers. This
+--  project builds the core sources (src/, without src/net/ and without
+--  Beacon.Topic.Timed) together with an instance, under the pragmas in
+--  jorvik.adc, and links a small program that runs on the native runtime.
+--  No embedded runtime is needed.
+--
+--     gprbuild -P jorvik/jorvik.gpr && ./jorvik/bin/jorvik_check
+
+project Jorvik is
+   for Source_Dirs use ("src", "../src");
+   for Excluded_Source_Files use
+     ("beacon-topic-timed.ads", "beacon-topic-timed.adb");
+   for Object_Dir use "obj";
+   for Exec_Dir use "bin";
+   for Create_Missing_Dirs use "True";
+   for Main use ("jorvik_check.adb");
+
+   package Compiler is
+      for Local_Configuration_Pragmas use "jorvik.adc";
+      for Default_Switches ("Ada") use
+        ("-gnat2022", "-gnata", "-gnatwa", "-gnatwe", "-gnatVa",
+         "-gnatyg", "-gnatyM100", "-g", "-O1", "-fstack-check");
+   end Compiler;
+
+   package Binder is
+      for Switches ("Ada") use ("-Es");
+   end Binder;
+end Jorvik;

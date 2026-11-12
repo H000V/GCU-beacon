@@ -1,0 +1,12 @@
+--  Configuration for the Jorvik and zero-heap check (Task 3.4).
+--  Applied to every unit built by jorvik.gpr, including the core sources.
+
+pragma Profile (Jorvik);
+
+--  Zero heap: no allocator, no hidden heap use by the compiler, and no
+--  secondary stack. Any violation in the core is a compile error.
+pragma Restrictions (No_Allocators);
+pragma Restrictions (No_Implicit_Heap_Allocations);
+pragma Restrictions (No_Secondary_Stack);
+
+pragma Queuing_Policy (Priority_Queuing);

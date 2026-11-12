@@ -128,11 +128,15 @@ representation clause.
   no ownership.
 - Retransmission. A reliable transport over UDP is a project in itself;
   do the honest measurement first.
-- An embedded network transport. `BEACON_NETWORK=no` gives the core
-  on a full tasking runtime. Light tasking is the goal but not there
-  yet: `Beacon.Topic` currently fails the Jorvik profile (its entry
-  barriers call functions, which `Pure_Barriers` forbids, and the timed
-  `Receive` uses a `select ... or delay`, which `No_Select_Statements`
-  forbids) and Ravenscar as well (two entries per protected object).
-  Task 3.4 owns that. ZFP cannot host `Beacon.Topic`; use
-  `Beacon.Queue` directly there.
+- An embedded network transport. `BEACON_NETWORK=no` gives the core,
+  which needs a tasking runtime. Jorvik is the supported light-tasking
+  profile: CI builds and runs an instance of `Beacon.Topic` under
+  `pragma Profile (Jorvik)` with no allocators and no secondary stack
+  (`jorvik/jorvik.gpr`, Task 3.4). The check runs on the native
+  runtime; it has not been run on an embedded Jorvik runtime.
+- A `Receive` with a timeout in the core. It needs a `select ... or
+  delay`, which Jorvik forbids (`No_Select_Statements`), so it lives in
+  the child package `Beacon.Topic.Timed`, for full runtimes only.
+- Ravenscar. The protected queue has two entries (`Push` and `Pop`) and
+  Ravenscar allows one per protected object.
+- ZFP support for `Beacon.Topic`. Use `Beacon.Queue` directly there.

@@ -13,12 +13,18 @@
 --  Single writer: one Publisher per instantiation. Create_Publisher
 --  refuses a second one.
 --
---  Runtime needs: full tasking today. Not Jorvik yet: the entry
---  barriers call functions (Pure_Barriers) and the timed Receive uses a
---  select with a delay (No_Select_Statements). Not Ravenscar either (two
---  entries per protected object). Not ZFP. On ZFP use Beacon.Queue directly.
+--  Runtime needs: the Jorvik profile (light tasking) or a full runtime.
+--  CI builds and runs an instance under pragma Profile (Jorvik) with no
+--  allocators and no secondary stack (see jorvik/jorvik.gpr). The entry
+--  barriers read only Boolean components and the Mode discriminant, as
+--  Pure_Barriers requires. Not Ravenscar: the protected queue has two
+--  entries and Ravenscar allows one. Not ZFP. On ZFP use Beacon.Queue
+--  directly.
+--
+--  A Receive with a timeout needs a select statement, which Jorvik
+--  forbids. It lives in the child package Beacon.Topic.Timed, for full
+--  runtimes only.
 
-with Ada.Real_Time;
 with Beacon.Queue;
 with System;
 
@@ -80,15 +86,6 @@ package Beacon.Topic is
    procedure Receive (S : in out Subscriber; Msg : out Message_Type)
      with Pre => Is_Registered (S);
 
-   --  Blocks until a message is available or Timeout elapses.
-   --  Success is True if a message was retrieved, False on timeout.
-   procedure Receive
-     (S       : in out Subscriber;
-      Msg     : out Message_Type;
-      Timeout : Ada.Real_Time.Time_Span;
-      Success : out Boolean)
-     with Pre => Is_Registered (S);
-
    procedure Try_Receive
      (S       : in out Subscriber;
       Msg     : out Message_Type;
@@ -109,7 +106,7 @@ private
    protected type Bounded_Queue (Mode : Delivery_Mode)
      with Priority => Ceiling_Priority
    is
-      --  Barrier: Best_Effort always open; Reliable open when not full.
+      --  Barrier: Best_Effort always open; Reliable open when not Full.
       entry Push (Msg : Message_Type);
       procedure Try_Push (Msg : Message_Type; Accepted : out Boolean);
       entry Pop (Msg : out Message_Type);
@@ -119,6 +116,12 @@ private
    private
       Q     : Ring.Queue_Type := Ring.Empty_Queue;
       Drops : Natural := 0;
+      --  Mirrors of Ring.Is_Full (Q) and Ring.Is_Empty (Q), refreshed by
+      --  every operation that changes Q. The barriers read these and not
+      --  the functions, because Pure_Barriers (Jorvik) forbids a function
+      --  call in a barrier.
+      Full  : Boolean := False;
+      Empty : Boolean := True;
    end Bounded_Queue;
 
    type Subscriber (Mode : Delivery_Mode) is limited record
