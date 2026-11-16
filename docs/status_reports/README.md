@@ -61,9 +61,12 @@ This directory catalogs the weekly progress updates and status reports submitted
 | Protected Barrier Concurrency                                          in gnat.adc and priority |
 |                                                                        aspects on queues.       |
 |-------------------------------------------------------------------------------------------------|
-| High-Frequency Soak Stress &           Week 9 (13%)   Active           Phased test ramp-up with |
-| Task Scheduling Jitter (Task 3.3)                                       property tests and CPU   |
-|                                                                        affinity monitoring.     |
+| High-Frequency Soak Stress &           Week 9 (13%)   Measured         Task 3.3 soak passes;    |
+| Task Scheduling Jitter (Task 3.3)                     (Week 10)        Dropped(Reliable) = 0.   |
+|                                                                        Windows timer tick (16   |
+|                                                                        ms) dominates desktop    |
+|                                                                        timing: use Linux CI.    |
+|                                                                        See Task 3.3 report.     |
 +-------------------------------------------------------------------------------------------------+
 ```
 

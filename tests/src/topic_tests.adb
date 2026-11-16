@@ -83,8 +83,8 @@ begin
 
    --  TODO (weeks 5-8): blocking Publish on a full Reliable queue, from a
    --  separate task, verified to unblock when the subscriber drains.
-   --  TODO (weeks 9-12): load test, N publishers tasks, sustained
-   --  overflow, assert Dropped (Rel) = 0 at the end. Always.
+   --  Load test (sustained overflow, many tasks, Dropped (Rel) = 0 at
+   --  the end): see topic_soak_tests.adb (Task 3.3).
 
    New_Line;
    if Failures = 0 then

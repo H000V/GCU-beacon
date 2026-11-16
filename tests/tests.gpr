@@ -7,7 +7,7 @@ project Tests is
    for Create_Missing_Dirs use "True";
    for Main use
      ("queue_tests.adb", "queue_property_tests.adb", "topic_tests.adb",
-      "topic_timed_tests.adb", "wire_tests.adb");
+      "topic_timed_tests.adb", "topic_soak_tests.adb", "wire_tests.adb");
    package Compiler is
       for Local_Configuration_Pragmas use "../gnat.adc";
       for Default_Switches ("Ada") use

@@ -145,8 +145,8 @@ flowchart LR
 
 * **Task 3.3: Multi-Task Sustained Soak Stress Test**
   * **Lead Engineer:** Ryan Tomasko (Security & Validation Engineer)
-  * **Description:** Subject the in-process core to sustained high-frequency load (e.g. 1 kHz publish rate) to verify memory stability, zero latency spikes, and the invariant `Dropped(Reliable) = 0`.
-  * **Resources Required:** High-load multi-threaded test environment; CPU utilization monitor; [`tests/src/topic_tests.adb`](../tests/src/topic_tests.adb); Visual Studio Code.
+  * **Description:** Subject the in-process core to sustained high-frequency load (e.g. 1 kHz publish rate) to verify memory stability, zero latency spikes, and the invariant `Dropped(Reliable) = 0`. **Complete (11/15/2026):** [`tests/src/topic_soak_tests.adb`](../tests/src/topic_soak_tests.adb) runs a 1 kHz soak, then a `Publish` flood and a `Try_Publish` flood at the same time, with stalling and fast subscribers of both modes. It checks that every Reliable message arrives once and in order, `Dropped(Reliable) = 0`, exact Best_Effort drop accounting, and no corruption. It runs in CI (about 16 s). A 600 s run plus two 5,000,000-message floods passed with no memory growth, and the suite caught all 4 seeded `Beacon.Topic` bugs. Latency is measured and reported, not gated: the Windows timer tick (about 16 ms) dominates desktop timing (see [`docs/TASK_3_3_VERIFICATION_REPORT.md`](TASK_3_3_VERIFICATION_REPORT.md)).
+  * **Resources Required:** High-load multi-threaded test environment; CPU utilization monitor (`Ada.Execution_Time` per task, plus an in-test monitor task); [`tests/src/topic_soak_tests.adb`](../tests/src/topic_soak_tests.adb); Visual Studio Code.
   * **Time Needed:** 20 hours | **Duration:** 1 week (Nov 09 – Nov 15, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
@@ -168,6 +168,7 @@ flowchart LR
     * **`No_Select_Statements`** at [`src/beacon-topic.adb`](../src/beacon-topic.adb) line 137. The timed `Receive` added in Task 2.1 uses `select ... or delay`.
       * *Fix (decided 11/06/2026):* move the timed `Receive` into a full-tasking child package, `Beacon.Topic.Timed`, so the core `Beacon.Topic` compiles under Jorvik and desktop builds keep the feature. Move the Task 2.2 timeout tests to the child package and keep them passing. Update the callers (tests, demos, and the Task 4.4 egress).
     * **Ravenscar is out of reach as designed:** `Bounded_Queue` has two entries (`Max_Protected_Entries = 1`). Record Jorvik as the supported light-tasking profile.
+    * **Regression check (added 11/15/2026, from Task 3.3):** [`tests/src/topic_soak_tests.adb`](../tests/src/topic_soak_tests.adb) was run against the barrier rewrite and the `Beacon.Topic.Timed` move (commit `c0e0ad7`) and passed, along with every unit suite. The soak caught all 4 seeded `Beacon.Topic` bugs (see [`TASK_3_3_VERIFICATION_REPORT.md`](TASK_3_3_VERIFICATION_REPORT.md) §5) and runs in CI, so it guards later edits too.
     * **Regression guard:** add a CI step that compiles the core units (`src/` with `BEACON_NETWORK=no`, excluding `Beacon.Topic.Timed`) using a configuration file containing `pragma Profile (Jorvik);`. A plain compile on the native toolchain is enough, so the check does not need the embedded runtime.
     * When the fix lands, update the "Runtime needs" comment in [`src/beacon-topic.ads`](../src/beacon-topic.ads) and the light-tasking note in [`ARCHITECTURE.md`](../ARCHITECTURE.md).
     * The `gnatmem` and zero-heap scope stays as planned. The estimate was raised from 16 to 24 hours on 11/06/2026 to cover these code changes.

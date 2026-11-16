@@ -30,6 +30,10 @@ jobs:
         run: |
           alr -n exec -- gprbuild -P jorvik/jorvik.gpr
           ./jorvik/bin/jorvik_check
+      - name: Multi-task soak of Beacon.Topic (1 kHz for 10 s, then two concurrent floods)
+        run: |
+          cd tests
+          ./bin/topic_soak_tests
       - name: In-process demo (reliable never drops, best-effort keeps newest)
         run: |
           cd demo
