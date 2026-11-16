@@ -10,6 +10,16 @@
 --  at most Max_Subscribers. Subscribers register at startup, before any
 --  Publish. Registration is not task-safe by design; publishing is.
 --
+--  Registry lockdown (FR-07): the first Publish or Try_Publish locks the
+--  registry for the rest of the program. After that, Create_Subscriber
+--  and Delete_Subscriber fail their preconditions, so the table is
+--  static while messages flow and never holds a dangling access value.
+--  The lock catches a late registration; it does not make registering
+--  from another task safe. Register from one task, then publish.
+--
+--  The preconditions of this unit are always checked, even in a build
+--  without -gnata, so the lockdown holds in every build.
+--
 --  Single writer: one Publisher per instantiation. Create_Publisher
 --  refuses a second one.
 --
@@ -35,6 +45,12 @@ generic
    Ceiling_Priority : System.Any_Priority := System.Priority'Last;
 package Beacon.Topic is
 
+   --  Check every precondition below in every build, so the registry
+   --  lockdown cannot be compiled out. It must sit inside the generic:
+   --  placed before the context clause, GNAT does not apply it to an
+   --  instance built without -gnata (checked on 11/16/2026).
+   pragma Assertion_Policy (Pre => Check);
+
    type Publisher is limited private;
    type Subscriber (Mode : Delivery_Mode) is limited private;
 
@@ -49,21 +65,28 @@ package Beacon.Topic is
      with Pre  => not Has_Publisher and then not Is_Created (P),
           Post => Has_Publisher and then Is_Created (P);
 
+   --  True once Publish or Try_Publish has run. Never goes back to False.
+   function Is_Locked return Boolean;
+
    --  Delivers Msg to every registered subscriber, in registration order.
    --  Reliable subscriber with a full queue: blocks until it has room.
    --  Best_Effort subscriber with a full queue: drops its oldest, counts it.
+   --  Locks the registry.
    procedure Publish (P : Publisher; Msg : Message_Type)
-     with Pre => Is_Created (P);
+     with Pre  => Is_Created (P),
+          Post => Is_Locked;
 
    --  Never blocks. Delivered is False if at least one Reliable
    --  subscriber was full; that subscriber did not get Msg, the others did.
    --  (Week 4 decision: keep this partial semantics, or make it all-or-
    --  nothing. Partial is simpler and matches DDS per-reader queues.)
+   --  Locks the registry.
    procedure Try_Publish
      (P         : Publisher;
       Msg       : Message_Type;
       Delivered : out Boolean)
-     with Pre => Is_Created (P);
+     with Pre  => Is_Created (P),
+          Post => Is_Locked;
 
    ----------------
    -- Subscriber --
@@ -76,11 +99,24 @@ package Beacon.Topic is
 
    --  S must outlive every Publish: declare it at library level or in
    --  the scope that owns the whole run. No heap, so no copy is taken.
+   --  Only before the first Publish (see Is_Locked).
    procedure Create_Subscriber (S : aliased in out Subscriber)
-     with Pre  => Subscriber_Count < Max_Subscribers
+     with Pre  => not Is_Locked
+                  and then Subscriber_Count < Max_Subscribers
                   and then not Is_Registered (S),
           Post => Subscriber_Count = Subscriber_Count'Old + 1
                   and then Is_Registered (S);
+
+   --  Removes S from the registry and frees its slot. The subscribers
+   --  after S move up one place, so registration order is kept. Only
+   --  before the first Publish (see Is_Locked): once the registry is
+   --  locked, a subscriber stays registered until the program ends, so
+   --  it must outlive every Publish. S's queue is empty here, because
+   --  nothing has been published yet.
+   procedure Delete_Subscriber (S : aliased in out Subscriber)
+     with Pre  => not Is_Locked and then Is_Registered (S),
+          Post => Subscriber_Count = Subscriber_Count'Old - 1
+                  and then not Is_Registered (S);
 
    --  Blocks until a message is available.
    procedure Receive (S : in out Subscriber; Msg : out Message_Type)

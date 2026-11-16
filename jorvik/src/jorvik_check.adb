@@ -31,8 +31,17 @@ begin
    Topic.Create_Subscriber (Rel);
    Topic.Create_Subscriber (Best);
 
+   --  Subscriber lifecycle before the lock (Task 3.7).
+   Topic.Delete_Subscriber (Best);
+   Check (Topic.Subscriber_Count = 1 and then not Topic.Is_Registered (Best),
+          "lifecycle: Delete_Subscriber frees the slot");
+   Topic.Create_Subscriber (Best);
+   Check (Topic.Subscriber_Count = 2 and then not Topic.Is_Locked,
+          "lifecycle: the slot is reused, registry still unlocked");
+
    --  Blocking Publish and Receive go through the two entries.
    Topic.Publish (Pub, (Id => 1, Value => 1.5));
+   Check (Topic.Is_Locked, "lock: the first Publish locks the registry");
    Topic.Receive (Rel, Msg);
    Check (Msg.Id = 1, "reliable: entry Push then entry Pop");
    Topic.Receive (Best, Msg);

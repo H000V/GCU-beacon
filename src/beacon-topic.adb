@@ -80,12 +80,27 @@ package body Beacon.Topic is
    Registered      : Natural := 0;
    Publisher_Taken : Boolean := False;
 
+   --  Set by the publisher's task, read by whoever registers. Atomic so
+   --  that read is defined; see the spec for what the lock does not cover.
+   Locked : Boolean := False with Atomic;
+
+   --  Called before the fan-out, so a registration that races the first
+   --  Publish is more likely to see the lock. Writes once, not per message.
+   procedure Lock;
+   procedure Lock is
+   begin
+      if not Locked then
+         Locked := True;
+      end if;
+   end Lock;
+
    ---------------
    -- Publisher --
    ---------------
 
    function Has_Publisher return Boolean is (Publisher_Taken);
    function Is_Created (P : Publisher) return Boolean is (P.Created);
+   function Is_Locked return Boolean is (Locked);
 
    procedure Create_Publisher (P : in out Publisher) is
    begin
@@ -96,6 +111,7 @@ package body Beacon.Topic is
    procedure Publish (P : Publisher; Msg : Message_Type) is
       pragma Unreferenced (P);  --  the precondition is the whole use
    begin
+      Lock;
       for I in 1 .. Registered loop
          Registry (I).Queue.Push (Msg);
       end loop;
@@ -109,6 +125,7 @@ package body Beacon.Topic is
       pragma Unreferenced (P);
       Accepted : Boolean;
    begin
+      Lock;
       Delivered := True;
       for I in 1 .. Registered loop
          Registry (I).Queue.Try_Push (Msg, Accepted);
@@ -129,6 +146,23 @@ package body Beacon.Topic is
       Registry (Registered) := S'Unchecked_Access;
       S.Registered := True;
    end Create_Subscriber;
+
+   procedure Delete_Subscriber (S : aliased in out Subscriber) is
+      Target : constant Subscriber_Access := S'Unchecked_Access;
+   begin
+      for I in 1 .. Registered loop
+         if Registry (I) = Target then
+            --  Close the gap and keep registration order (the spec
+            --  promises fan-out in registration order).
+            Registry (I .. Registered - 1) := Registry (I + 1 .. Registered);
+            Registry (Registered) := null;
+            Registered := Registered - 1;
+            S.Registered := False;
+            return;
+         end if;
+      end loop;
+      --  Not reached: Is_Registered (S) means S is in the table.
+   end Delete_Subscriber;
 
    procedure Receive (S : in out Subscriber; Msg : out Message_Type) is
    begin

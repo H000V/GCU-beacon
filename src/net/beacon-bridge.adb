@@ -28,10 +28,13 @@ package body Beacon.Bridge is
       Got      : Boolean;
       use type Wire.Sequence_Type;
    begin
+      --  Register inside the rendezvous, so Start_Egress returns only
+      --  once Sub is in the registry (Task 3.7, the registration race
+      --  from Task 4.4). A refused registration raises in the caller.
       accept Start (T : Transport_Ref) do
          Net := T;
+         Local.Create_Subscriber (Sub);
       end Start;
-      Local.Create_Subscriber (Sub);
       while not Stopping loop
          Local.Try_Receive (Sub, Msg, Got);
          if Got then
@@ -72,10 +75,12 @@ package body Beacon.Bridge is
       use type Wire.Topic_Id_Type;
       use type Wire.Sequence_Type;
    begin
+      --  Take the Publisher slot inside the rendezvous, so Start_Ingress
+      --  returns only once Has_Publisher is True.
       accept Start (T : Transport_Ref) do
          Net := T;
+         Local.Create_Publisher (Pub);
       end Start;
-      Local.Create_Publisher (Pub);
       while not Stopping loop
          Net.Receive (Frame, Count, Poll_Timeout);
          if Count > 0 then

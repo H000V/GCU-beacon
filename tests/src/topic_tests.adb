@@ -2,6 +2,7 @@
 --  The Week 8 review question, verbatim: fill a reliable queue past
 --  capacity and verify the documented behavior actually occurs.
 
+with Ada.Assertions;
 with Ada.Command_Line;
 with Ada.Real_Time;  use Ada.Real_Time;
 with Ada.Text_IO;    use Ada.Text_IO;
@@ -39,8 +40,107 @@ procedure Topic_Tests is
    Got       : Boolean;
    Delivered : Boolean;
 
+   --  Subscriber lifecycle and registry lockdown (Task 3.7). The lock is
+   --  permanent per instantiation, so these use their own instances.
+   procedure Lifecycle_Tests;
+   procedure Lifecycle_Tests is
+      package L is new Beacon.Topic
+        (Message_Type => Reading, Queue_Depth => Depth, Max_Subscribers => 3);
+
+      L_Pub : L.Publisher;
+      A     : aliased L.Subscriber (Reliable);
+      B     : aliased L.Subscriber (Best_Effort);
+      C     : aliased L.Subscriber (Reliable);
+      D     : aliased L.Subscriber (Best_Effort);
+      M     : Reading;
+      Raised : Boolean;
+   begin
+      Check (not L.Is_Locked, "lock: a new topic is unlocked");
+
+      L.Create_Subscriber (A);
+      L.Create_Subscriber (B);
+      L.Create_Subscriber (C);
+      Check (L.Subscriber_Count = 3, "lifecycle: registry full (3 of 3)");
+
+      L.Delete_Subscriber (B);
+      Check (L.Subscriber_Count = 2 and then not L.Is_Registered (B),
+             "lifecycle: delete removes the subscriber");
+      Check (L.Is_Registered (A) and then L.Is_Registered (C),
+             "lifecycle: delete leaves the others registered");
+
+      --  The registry was full, so this only succeeds if the slot was freed.
+      L.Create_Subscriber (D);
+      Check (L.Subscriber_Count = 3 and then L.Is_Registered (D),
+             "lifecycle: the freed slot is reused");
+
+      --  A deleted subscriber can register again.
+      L.Delete_Subscriber (D);
+      L.Create_Subscriber (B);
+      Check (L.Is_Registered (B) and then not L.Is_Registered (D),
+             "lifecycle: a deleted subscriber can register again");
+
+      --  Deleting an unregistered subscriber fails its precondition.
+      Raised := False;
+      begin
+         L.Delete_Subscriber (D);
+      exception
+         when Ada.Assertions.Assertion_Error => Raised := True;
+      end;
+      Check (Raised, "lifecycle: deleting an unregistered subscriber is refused");
+
+      --  Free a slot, so the checks below fail only because of the lock.
+      L.Delete_Subscriber (B);
+      L.Create_Publisher (L_Pub);
+      Check (not L.Is_Locked, "lock: Create_Publisher does not lock");
+
+      L.Publish (L_Pub, (Id => 5, Value => 0.0));
+      Check (L.Is_Locked, "lock: the first Publish locks the registry");
+      Check (L.Pending (A) = 1 and then L.Pending (C) = 1
+               and then L.Pending (B) = 0,
+             "lifecycle: registered subscribers get the message, deleted do not");
+      L.Receive (A, M);
+      L.Receive (C, M);
+
+      Raised := False;
+      begin
+         L.Create_Subscriber (B);
+      exception
+         when Ada.Assertions.Assertion_Error => Raised := True;
+      end;
+      Check (Raised and then not L.Is_Registered (B)
+               and then L.Subscriber_Count = 2,
+             "lock: Create_Subscriber after the first Publish is refused");
+
+      Raised := False;
+      begin
+         L.Delete_Subscriber (A);
+      exception
+         when Ada.Assertions.Assertion_Error => Raised := True;
+      end;
+      Check (Raised and then L.Is_Registered (A)
+               and then L.Subscriber_Count = 2,
+             "lock: Delete_Subscriber after the first Publish is refused");
+   end Lifecycle_Tests;
+
+   procedure Try_Publish_Lock_Test;
+   procedure Try_Publish_Lock_Test is
+      package L is new Beacon.Topic
+        (Message_Type => Reading, Queue_Depth => Depth, Max_Subscribers => 2);
+      L_Pub : L.Publisher;
+      A     : aliased L.Subscriber (Best_Effort);
+      Ok    : Boolean;
+   begin
+      L.Create_Subscriber (A);
+      L.Create_Publisher (L_Pub);
+      L.Try_Publish (L_Pub, (Id => 1, Value => 0.0), Ok);
+      Check (Ok and then L.Is_Locked, "lock: the first Try_Publish locks the registry");
+   end Try_Publish_Lock_Test;
+
 begin
    Put_Line ("Beacon.Topic tests");
+
+   Lifecycle_Tests;
+   Try_Publish_Lock_Test;
 
    T.Create_Publisher (Pub);
    T.Create_Subscriber (Rel);

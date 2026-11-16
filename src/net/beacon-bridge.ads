@@ -44,14 +44,16 @@ generic
 package Beacon.Bridge is
 
    --  Forward local publications to T. Registers a local Subscriber in
-   --  Mode; counts toward Max_Subscribers.
+   --  Mode before it returns; counts toward Max_Subscribers. Call it
+   --  before the first local Publish, like any Create_Subscriber.
    procedure Start_Egress
      (T    : not null access Transport.Transport'Class;
       Mode : Delivery_Mode)
-     with Pre => Local.Subscriber_Count < Local.Max_Subscribers;
+     with Pre => not Local.Is_Locked
+                 and then Local.Subscriber_Count < Local.Max_Subscribers;
 
    --  Publish frames arriving on T (with matching Topic_Id) locally.
-   --  Takes the local Publisher slot.
+   --  Takes the local Publisher slot before it returns.
    procedure Start_Ingress
      (T : not null access Transport.Transport'Class)
      with Pre => not Local.Has_Publisher;

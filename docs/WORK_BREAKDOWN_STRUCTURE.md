@@ -195,7 +195,7 @@ flowchart LR
 
 * **Task 3.7: Subscriber Lifecycle & Registry Lockdown**
   * **Lead Engineer:** Hovan Hodges (Core Systems Engineer)
-  * **Description:** Add registry lockdown (FR-07) and a startup/shutdown-only `Delete_Subscriber`, so the subscriber registry is static once publishing begins and can never hold a dangling access value.
+  * **Description:** Add registry lockdown (FR-07) and a `Delete_Subscriber` that works only before the first `Publish`, so the subscriber registry is static once publishing begins and can never hold a dangling access value. **Complete (11/16/2026):** `Is_Locked`, `Delete_Subscriber` and the lock are in [`src/beacon-topic.ads`](../src/beacon-topic.ads). The preconditions of `Beacon.Topic` are now checked in every build (`pragma Assertion_Policy (Pre => Check)` inside the generic), so the lock cannot be compiled out. Thirteen new checks in [`tests/src/topic_tests.adb`](../tests/src/topic_tests.adb) and three in [`jorvik/src/jorvik_check.adb`](../jorvik/src/jorvik_check.adb) cover it. The Task 4.4 registration race was fixed here as well (see Task 4.4).
   * **Resources Required:** GNAT 2022 compiler; [`src/beacon-topic.ads`](../src/beacon-topic.ads) and [`src/beacon-topic.adb`](../src/beacon-topic.adb); [`tests/src/topic_tests.adb`](../tests/src/topic_tests.adb); Visual Studio Code.
   * **Time Needed:** 12 hours | **Duration:** 1 week (Nov 16 – Nov 22, 2026).
   * **Costs Associated:** \$0.
@@ -204,7 +204,7 @@ flowchart LR
     * *Successors:* Task 3.6, Task 4.4.
   * **Added 11/06/2026 from the code review** (items U-1 and U-2 in [`UNSCHEDULED_CHANGES_REPORT.md`](UNSCHEDULED_CHANGES_REPORT.md)):
     * **Registry lockdown (FR-07, Open Decision #2):** add a package-level `Locked` flag, set by the first `Publish` or `Try_Publish`, an `Is_Locked` query, and `Pre => not Is_Locked` on `Create_Subscriber`. This keeps design rule 4 (static configuration) and makes the "register before any `Publish`" rule checkable.
-    * **Unregister (Open Decision #4):** add `Delete_Subscriber (S : in out Subscriber)` with `Pre => Is_Registered (S) and then not Is_Locked`. It removes `S` from the registry and closes the gap. It is for startup and shutdown only: once the registry is locked, subscribers live until the program ends.
+    * **Unregister (Open Decision #4):** add `Delete_Subscriber (S : in out Subscriber)` with `Pre => Is_Registered (S) and then not Is_Locked`. It removes `S` from the registry and closes the gap. It works only before the first `Publish`: the lock never clears, so once it is set, subscribers live until the program ends. (Changed 11/16/2026 from "startup and shutdown only", which the permanent lock rules out. Shutdown cleanup for the bridge is the library-level egress subscriber in Task 4.4.)
     * Tests in `topic_tests`: `Create_Subscriber` after the first `Publish` fails its precondition, and a subscriber can be deleted and its slot reused before the lock.
     * Starts after Task 3.4 because both change `src/beacon-topic.adb`. Ships in `v0.1.0-inproc` (Task 3.6).
 
@@ -295,6 +295,7 @@ flowchart LR
       * two registrations at once can collide on `Registered`;
       * the `Pre` on `Start_Egress` checks a count that is out of date.
       * *Fix:* move both calls inside the `accept` body. With the Task 3.7 lockdown, `Start_Egress` must also run before the first `Publish`; the precondition on `Create_Subscriber` now enforces that.
+      * **Done in Task 3.7 (11/16/2026):** both calls are inside the `accept` bodies and `Start_Egress` has `Pre => not Local.Is_Locked`. It was moved forward because, with the lock, losing this race made the egress task fail its precondition and end silently, which would have broken the CI UDP step before Task 4.4.
     * **Use after free once `Stop` is called (bug):** the egress `Sub` lives on the task's stack, but the topic registry keeps an access value to it after the task ends. Any later `Publish` uses freed memory, and a `Reliable` egress that nobody drains blocks the publisher forever.
       * *Fix (decided 11/06/2026):* declare the egress subscriber at library level inside the bridge body, so the registry never points at freed memory. After `Stop`, the egress task keeps draining and discarding messages instead of ending, so a `Reliable` egress can never block the publisher. `Subscriber` is discriminated by `Mode`, so the egress `Mode` moves from `Start_Egress` to a generic formal of `Beacon.Bridge`. The Task 3.7 `Delete_Subscriber` cannot be used here, because the registry is locked by the time `Stop` runs.
     * **Tasks die silently (bug):** neither task body has an exception handler. A `Socket_Error` (see Task 4.3) or a `Constraint_Error` from a user `Serialize` stops the task, and nothing records it.

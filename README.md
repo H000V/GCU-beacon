@@ -84,8 +84,12 @@ Read `ARCHITECTURE.md` before touching anything.
 2. Registration is not task-safe and must precede any `Publish`. Keep
    as a documented rule (current), or make the registry a protected
    object. The in-process demo shows what happens when you get this
-   wrong: it waits on a `Go` entry before publishing. *Still open*:
-   only a second `Create_Publisher` is refused today.
+   wrong: it waits on a `Go` entry before publishing. *Closed (Task
+   3.7)*: kept as a rule, now enforced. The first `Publish` or
+   `Try_Publish` locks the registry (`Is_Locked`), and
+   `Create_Subscriber` after that fails its precondition. The
+   preconditions of `Beacon.Topic` are checked in every build, even
+   without `-gnata`.
 3. ~~`Receive` blocks with no timeout.~~ *Closed (Week 8)*: added
    `Receive (S, Msg, Timeout, Success)`. It uses a timed entry call,
    which the Ravenscar and Jorvik profiles forbid, so since Task 3.4
@@ -94,7 +98,11 @@ Read `ARCHITECTURE.md` before touching anything.
    compiles under Jorvik.
 4. Registry holds `Subscriber'Unchecked_Access`: a subscriber declared
    in a scope that exits leaves a dangling entry. Acceptable with the
-   "declare at library level" rule, or redesign. *Still open.*
+   "declare at library level" rule, or redesign. *Closed (Task 3.7)*:
+   `Delete_Subscriber` removes a subscriber before the first `Publish`.
+   Once the registry is locked a subscriber stays registered, so it
+   must outlive every `Publish` (library level, or the scope that owns
+   the run).
 
 ## Build
 

@@ -73,8 +73,16 @@ A fixed array of `Max_Subscribers` access values, filled by
 `Create_Subscriber` with `S'Unchecked_Access`. Not protected: register
 at startup, before any `Publish`, from one task. The in-process demo
 shows the failure when this is ignored (tasks activating before `main`
-registers) and the cure (a `Go` entry). Whether to make registration
-protected is a Week 4 decision.
+registers) and the cure (a `Go` entry).
+
+Lockdown (FR-07, Task 3.7): the first `Publish` or `Try_Publish` sets
+an atomic `Locked` flag that never clears. `Create_Subscriber` and
+`Delete_Subscriber` require `not Is_Locked`, so the table is static
+while messages flow. `Delete_Subscriber` shifts the later entries up
+one place to keep registration order. The lock detects a late
+registration; it does not make registering from another task safe.
+`Beacon.Topic` sets `Assertion_Policy (Pre => Check)` inside the
+generic, so its preconditions hold in builds without `-gnata`.
 
 ## Wire
 
