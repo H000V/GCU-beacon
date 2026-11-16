@@ -15,6 +15,7 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **SR-04** | **Week 7** | 10/25/2026 | **7%** | Successful delivery of **Milestone 1: Design Review Presentation 1**, team roster consolidation (Ryan Tomasko assumes Validation role), and kickoff of Timed `Receive`. | [`STATUS_REPORT_04_OCT_25.md`](STATUS_REPORT_04_OCT_25.md) |
 | **SR-05** | **Week 8** | 11/01/2026 | **10%** | Implementation of timed `Receive` with its first unit tests (Task 2.1; Task 2.2 still in progress at report time), closure of Open Design Decision 3, and planning of protected entry barrier hardening for Phase 2 completion. | [`STATUS_REPORT_05_NOV_01.md`](STATUS_REPORT_05_NOV_01.md) |
 | **SR-06** | **Week 9** | 11/08/2026 | **13%** | Hardening protected queue barriers with CPP (Task 2.3), formal inductive proof and Ada Type_Invariant verification for Best-Effort ring buffer drop-oldest arithmetic (Task 3.1), then a full GNATprove proof of `Beacon.Queue` (71/71 checks). | [`STATUS_REPORT_06_NOV_08.md`](STATUS_REPORT_06_NOV_08.md) |
+| **SR-07** | **Week 10** | 11/15/2026 | **19%** | Jorvik profile and zero-heap compliance of the core (Task 3.4), multi-task blocking-publish test closing Phase 2 (Task 2.4), drop-oldest property tests (Task 3.2), and the 11/6 code review follow-up plan (Tasks 3.7 and 4.2b added). | [`STATUS_REPORT_07_NOV_15.md`](STATUS_REPORT_07_NOV_15.md) |
 
 ---
 
@@ -52,10 +53,13 @@ This directory catalogs the weekly progress updates and status reports submitted
 |                                                                        Tomasko assumed all      |
 |                                                                        Validation duties.       |
 |-------------------------------------------------------------------------------------------------|
-| Embedded Profile & Zero-Heap           Week 6 (5%)    Active           Week 9 trial compile     |
-| Compliance (Jorvik)                                                    under Jorvik fails       |
-|                                                                        (Pure_Barriers, timed    |
-|                                                                        Receive). Task 3.4.      |
+| Embedded Profile & Zero-Heap           Week 6 (5%)    Mitigated        Task 3.4 (11/12): core   |
+| Compliance (Jorvik)                                   (Week 10)        builds and runs under    |
+|                                                                        Jorvik with no-heap and  |
+|                                                                        no-secondary-stack       |
+|                                                                        restrictions in CI. Not  |
+|                                                                        run on an embedded       |
+|                                                                        runtime yet.             |
 |-------------------------------------------------------------------------------------------------|
 | Multi-Task Synchronization &           Week 8 (10%)   Mitigated        Ceiling Priority Protocol|
 | Protected Barrier Concurrency                                          in gnat.adc and priority |
@@ -67,6 +71,11 @@ This directory catalogs the weekly progress updates and status reports submitted
 |                                                                        ms) dominates desktop    |
 |                                                                        timing: use Linux CI.    |
 |                                                                        See Task 3.3 report.     |
+|-------------------------------------------------------------------------------------------------|
+| Code Review Follow-Up Compressing      Week 10 (16%)  Active           Follow-ups applied 11/6; |
+| Week 11 Before Milestone 2                                             FR-08 deferred to Spring |
+|                                                                        2027; Tasks 2.4 and 3.4  |
+|                                                                        closed 11/12.            |
 +-------------------------------------------------------------------------------------------------+
 ```
 
