@@ -3,6 +3,7 @@
 --  capacity and verify the documented behavior actually occurs.
 
 with Ada.Command_Line;
+with Ada.Real_Time;  use Ada.Real_Time;
 with Ada.Text_IO;    use Ada.Text_IO;
 with Beacon;         use Beacon;
 with Beacon.Topic;
@@ -81,8 +82,131 @@ begin
    T.Try_Receive (Rel, Msg, Got);
    Check (not Got, "reliable drained, Try_Receive says empty");
 
-   --  TODO (weeks 5-8): blocking Publish on a full Reliable queue, from a
-   --  separate task, verified to unblock when the subscriber drains.
+   --  ========================================================================
+   --  Task 2.4: Multi-Task Blocking-Publish Test
+   --  ========================================================================
+   --  A separate publisher task calls Publish on a full Reliable queue.
+   --  It must block (not drop, not overwrite), and it must resume as soon
+   --  as the subscriber drains one slot. Atomic flags let the main task see
+   --  where the publisher is without touching the queue.
+
+   Check (T.Pending (Rel) = 0, "blocking publish: reliable queue starts empty");
+
+   --  1. Single blocked Publish, released by one Receive.
+   for I in 1 .. Depth loop
+      T.Publish (Pub, (Id => 300 + I, Value => 0.0));
+   end loop;
+   Check (T.Pending (Rel) = Depth, "blocking publish: reliable queue is full");
+
+   declare
+      Started  : Boolean := False with Atomic;
+      Finished : Boolean := False with Atomic;
+
+      task Blocked_Publisher;
+      task body Blocked_Publisher is
+      begin
+         Started := True;
+         T.Publish (Pub, (Id => 400, Value => 4.0));  --  must block here
+         Finished := True;
+      end Blocked_Publisher;
+
+      Deadline : Time;
+   begin
+      --  Wait for the task to reach Publish, then give it time to finish
+      --  if it (wrongly) does not block.
+      Deadline := Clock + Seconds (1);
+      while not Started and then Clock < Deadline loop
+         delay 0.001;
+      end loop;
+      delay 0.1;
+
+      Check (Started, "blocking publish: publisher task started");
+      Check (not Finished,
+             "blocking publish: Publish blocks while reliable queue is full");
+      Check (T.Pending (Rel) = Depth and then T.Dropped (Rel) = 0,
+             "blocking publish: full queue untouched while publisher waits");
+
+      --  Free exactly one slot.
+      T.Receive (Rel, Msg);
+      Check (Msg.Id = 301, "blocking publish: drained the oldest message");
+
+      Deadline := Clock + Seconds (2);
+      while not Finished and then Clock < Deadline loop
+         delay 0.001;
+      end loop;
+      Check (Finished, "blocking publish: publisher resumes after one drain");
+
+      if not Finished then
+         abort Blocked_Publisher;  --  keep the suite from hanging on failure
+      end if;
+   end;
+
+   Check (T.Pending (Rel) = Depth,
+          "blocking publish: released message filled the freed slot");
+   for Expected in 302 .. 303 loop
+      T.Receive (Rel, Msg);
+      Check (Msg.Id = Expected, "blocking publish: order kept," & Expected'Image);
+   end loop;
+   T.Receive (Rel, Msg);
+   Check (Msg.Id = 400, "blocking publish: blocked message delivered last");
+   Check (T.Dropped (Rel) = 0, "blocking publish: reliable dropped nothing");
+
+   --  2. Burst: the publisher sends far more than the queue holds while the
+   --  main task drains slowly. Publish must block and resume many times,
+   --  and every message must arrive exactly once, in order.
+   declare
+      Burst : constant := 4 * Depth;
+      Base  : constant := 500;
+
+      Sent : Natural := 0 with Atomic;
+
+      task Burst_Publisher;
+      task body Burst_Publisher is
+      begin
+         for I in 1 .. Burst loop
+            T.Publish (Pub, (Id => Base + I, Value => Float (I)));
+            Sent := Sent + 1;
+         end loop;
+      end Burst_Publisher;
+
+      In_Order : Boolean := True;
+      Received : Natural := 0;
+      Deadline : Time;
+   begin
+      --  Let the publisher run ahead: it can get exactly Depth in.
+      delay 0.1;
+      Check (T.Pending (Rel) = Depth and then Sent = Depth,
+             "burst: publisher stopped at queue capacity");
+
+      --  Poll with Try_Receive and a deadline, so a stuck publisher
+      --  fails the test instead of hanging it.
+      for I in 1 .. Burst loop
+         Deadline := Clock + Seconds (2);
+         loop
+            T.Try_Receive (Rel, Msg, Got);
+            exit when Got or else Clock >= Deadline;
+            delay 0.001;
+         end loop;
+         exit when not Got;
+         Received := Received + 1;
+         if Msg.Id /= Base + I then
+            In_Order := False;
+         end if;
+         delay 0.002;  --  slow consumer keeps the queue near full
+      end loop;
+
+      Check (Received = Burst, "burst: every message received");
+      Check (In_Order, "burst: messages arrive in publish order");
+      Check (Sent = Burst, "burst: publisher completed all publishes");
+
+      if Sent /= Burst then
+         abort Burst_Publisher;
+      end if;
+   end;
+
+   Check (T.Pending (Rel) = 0, "burst: reliable queue drained");
+   Check (T.Dropped (Rel) = 0, "burst: reliable dropped nothing under contention");
+
    --  Load test (sustained overflow, many tasks, Dropped (Rel) = 0 at
    --  the end): see topic_soak_tests.adb (Task 3.3).
 
