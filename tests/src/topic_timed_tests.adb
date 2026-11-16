@@ -63,6 +63,32 @@ begin
    Check (Got and then Msg.Id = 102,
           "timed receive: item ready with positive timeout returns True");
 
+   --  Task 2.2 timeout checks.
+
+   --  Duration: an empty queue really blocks for (about) the timeout.
+   Start := Clock;
+   T_Timed.Receive (Rel, Msg, Milliseconds (40), Got);
+   Check (not Got, "timed receive: empty queue timed out as expected");
+   Check (Clock - Start >= Milliseconds (35),
+          "timed receive: actually blocked for full duration (>= 35ms)");
+
+   --  Negative timeout: behaves like Try_Receive, returns at once.
+   T_Timed.Receive (Rel, Msg, -Milliseconds (10), Got);
+   Check (not Got,
+          "timed receive: negative timeout returns False immediately on empty");
+
+   --  Message already waiting: return at once, do not wait the timeout.
+   T.Publish (Pub, (Id => 201, Value => 99.0));
+   Start := Clock;
+   T_Timed.Receive (Rel, Msg, Milliseconds (500), Got);
+   Check (Got and then Msg.Id = 201, "timed receive: retrieved waiting message");
+   Check (Clock - Start < Milliseconds (50),
+          "timed receive: returned immediately when message was ready (< 50ms)");
+
+   --  Repeated timeouts leave the queue in a clean state.
+   T_Timed.Receive (Rel, Msg, Milliseconds (10), Got);
+   Check (not Got, "timed receive: consecutive empty check 1");
+
    --  The queue is empty again: the Empty flag behind the Pop barrier
    --  must have followed the last Receive.
    T_Timed.Receive (Rel, Msg, Milliseconds (10), Got);
