@@ -41,7 +41,7 @@ src/net/beacon-transport-udp UDP multicast over GNAT.Sockets
 src/net/beacon-bridge.ads    generic: Egress task (local sub -> wire), Ingress task (wire -> local pub)
 demo/telemetry.ads           message types + topic instantiations = the static registry
 demo/telemetry-codecs        Serialize/Deserialize by overlay of a rep-claused record
-demo/inproc_demo             1 kHz sensor + 10 Hz controller, checks both modes, exits non-zero on failure
+demo/inproc_demo             satellite: attitude 1 kHz, control loop 100 Hz, power 5 Hz, ground 10 Hz; checks both modes, exits non-zero on failure
 demo/net_publisher           200 readings over UDP ...
 demo/net_subscriber          ... received, CRC-checked, sequence gaps counted
 tests/                       queue (wrap, drop-oldest), topic (fan-out, overflow), topic_timed (receive with timeout), wire (CRC vector, rejects)
