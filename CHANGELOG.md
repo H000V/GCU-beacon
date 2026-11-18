@@ -4,6 +4,8 @@ All notable changes to beacon are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
 ## [0.1.0-inproc] - 2026-11-18
 
 First tagged release: the in-process core, verified. It covers
@@ -90,4 +92,5 @@ experimental preview; Phase 4 has not started on it.
 - `src/net/` is a preview: the UDP bridge has no retransmission, and
   the wire header still reports `Alignment = 4` (Task 4.1).
 
+[Unreleased]: https://github.com/H000V/GCU-beacon/compare/v0.1.0-inproc...HEAD
 [0.1.0-inproc]: https://github.com/H000V/GCU-beacon/releases/tag/v0.1.0-inproc

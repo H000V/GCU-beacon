@@ -1,6 +1,6 @@
 name = "beacon"
 description = "Typed publish-subscribe messaging: generic topics, protected queues"
-version = "0.1.0-inproc"
+version = "0.2.0-dev"
 authors = ["Olivier Henley"]
 maintainers = ["Olivier Henley <henley@adacore.com>"]
 maintainers-logins = ["ohenley"]
