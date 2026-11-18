@@ -175,7 +175,7 @@ flowchart LR
 
 * **Task 3.5: Expand Flight Telemetry Demo**
   * **Lead Engineer:** Praise Jibunor (Network Systems Engineer)
-  * **Description:** Enhance the in-process demonstration app with multi-rate telemetry topics simulating satellite flight instruments and control loops.
+  * **Description:** Enhance the in-process demonstration app with multi-rate telemetry topics simulating satellite flight instruments and control loops. **Complete (11/16/2026):** [`demo/src/inproc_demo.adb`](../demo/src/inproc_demo.adb) runs a small satellite for two seconds on four topics: attitude (about 1 kHz, Best_Effort), the attitude controller's wheel commands (about 100 Hz, Best_Effort), ground commands (about 10 Hz, Reliable) and power (about 5 Hz, Reliable). Ten checks cover in-order, loss-free Reliable delivery, newest-value Best_Effort delivery, the control loop rate and freshness, and the Safe mode command. The demo exits non-zero on any failure and runs in CI.
   * **Resources Required:** Flight simulation models; [`demo/src/inproc_demo.adb`](../demo/src/inproc_demo.adb) and [`demo/src/telemetry.ads`](../demo/src/telemetry.ads); Visual Studio Code.
   * **Time Needed:** 20 hours | **Duration:** 1 week (Nov 16 – Nov 22, 2026).
   * **Costs Associated:** \$0.
@@ -185,7 +185,7 @@ flowchart LR
 
 * **Task 3.6: Tag In-Process Release v0.1.0-inproc**
   * **Lead Engineer:** Full Engineering Team (Lead: Hovan Hodges)
-  * **Description:** Package and tag the verified in-process core release in Git, establishing the milestone baseline for subsequent network transports.
+  * **Description:** Package and tag the verified in-process core release in Git, establishing the milestone baseline for subsequent network transports. **Complete (11/18/2026):** annotated tag `v0.1.0-inproc` on the commit that sets the three crate versions to `0.1.0-inproc`, created only after the full CI workflow passed on that commit, and published as a GitHub pre-release. Release notes are in [`CHANGELOG.md`](../CHANGELOG.md). The release covers the in-process core (`src/`); `src/net/` ships as an experimental preview. The next commit moves the crates to `0.2.0-dev`.
   * **Resources Required:** Git version control.
   * **Time Needed:** 14 hours | **Duration:** 1 week (Nov 16 – Nov 22, 2026).
   * **Costs Associated:** \$0.

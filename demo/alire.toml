@@ -1,7 +1,7 @@
 name = "beacon_demo"
 description = "beacon demos: in-process and UDP"
 executables = ["inproc_demo", "net_publisher", "net_subscriber"]
-version = "0.1.0-dev"
+version = "0.1.0-inproc"
 authors = ["Olivier Henley"]
 maintainers = ["Olivier Henley <henley@adacore.com>"]
 maintainers-logins = ["ohenley"]

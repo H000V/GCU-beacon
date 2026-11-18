@@ -112,7 +112,8 @@ library by path.
 ```
 alr build                           # library, with src/net
 BEACON_NETWORK=no alr build         # library, in-process only
-cd tests && alr build && ./bin/queue_tests && ./bin/topic_tests && ./bin/topic_timed_tests && ./bin/wire_tests
+cd tests && alr build && ./bin/queue_tests && ./bin/queue_property_tests && ./bin/topic_tests && ./bin/topic_timed_tests && ./bin/wire_tests
+./bin/topic_soak_tests              # multi-task soak, about 16 s
 # Jorvik profile and zero-heap check of the core
 alr exec -- gprbuild -P jorvik/jorvik.gpr && ./jorvik/bin/jorvik_check
 cd demo  && alr build && ./bin/inproc_demo

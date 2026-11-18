@@ -101,6 +101,7 @@
 * **Task 3.1: Verify Best-Effort Drop-Oldest**
   * **Lead Engineer:** Hovan Hodges (Core Systems Engineer)
   * **Resources Required:** GNAT tracing utilities; GNATprove; [`src/beacon-queue.adb`](../src/beacon-queue.adb); Visual Studio Code.
+  * **Status:** Complete (11/04/2026). `Beacon.Queue` proved for every `Depth` (71/71 checks) on 11/06/2026. See [`TASK_3_1_VERIFICATION_REPORT.md`](TASK_3_1_VERIFICATION_REPORT.md).
   * **Time Needed:** 12 hours | **Duration:** 1 week (Nov 02 – Nov 08, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
@@ -110,6 +111,7 @@
 * **Task 3.2: Drop-Oldest Invariant & Property Tests**
   * **Lead Engineer:** Ryan Tomasko (Security & Validation Engineer)
   * **Resources Required:** Randomized model-based test generator (hand-rolled, `Ada.Numerics.Discrete_Random`); [`tests/src/`](../tests/src); Visual Studio Code.
+  * **Status:** Complete (11/07/2026). See [`TASK_3_2_VERIFICATION_REPORT.md`](TASK_3_2_VERIFICATION_REPORT.md).
   * **Time Needed:** 16 hours | **Duration:** 1 week (Nov 02 – Nov 08, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
@@ -129,6 +131,7 @@
 * **Task 3.4: Zero-Heap & Embedded Jorvik Audit**
   * **Lead Engineer:** Hovan Hodges (Core Systems Engineer)
   * **Resources Required:** GNAT Jorvik embedded runtime; `gnatmem` heap profiling utility; `-fstack-check` compiler diagnostics; [`beacon.gpr`](../beacon.gpr); Visual Studio Code.
+  * **Status:** Code complete (11/12/2026). No embedded runtime run and no `gnatmem`. See [`TASK_3_4_VERIFICATION_REPORT.md`](TASK_3_4_VERIFICATION_REPORT.md).
   * **Time Needed:** 24 hours (re-baselined from 16 on 11/06/2026) | **Duration:** 1 week (Nov 09 – Nov 15, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
@@ -148,6 +151,7 @@
 * **Task 3.5: Expand Flight Telemetry Demo**
   * **Lead Engineer:** Praise Jibunor (Network Systems Engineer)
   * **Resources Required:** Flight simulation models; [`demo/src/inproc_demo.adb`](../demo/src/inproc_demo.adb) and [`demo/src/telemetry.ads`](../demo/src/telemetry.ads); Visual Studio Code.
+  * **Status:** Complete (11/16/2026). [`inproc_demo`](../demo/src/inproc_demo.adb) runs attitude (1 kHz), wheel (100 Hz), ground (10 Hz) and power (5 Hz) topics with ten checks, in CI.
   * **Time Needed:** 20 hours | **Duration:** 1 week (Nov 16 – Nov 22, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
@@ -157,6 +161,7 @@
 * **Task 3.6: Tag In-Process Release v0.1.0-inproc**
   * **Lead Engineer:** Full Team (Lead: Hovan Hodges)
   * **Resources Required:** Git version control.
+  * **Status:** Complete (11/18/2026). Tag `v0.1.0-inproc` and a GitHub pre-release; release notes in [`CHANGELOG.md`](../CHANGELOG.md).
   * **Time Needed:** 14 hours | **Duration:** 1 week (Nov 16 – Nov 22, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**
@@ -166,6 +171,7 @@
 * **Task 3.7: Subscriber Lifecycle & Registry Lockdown**
   * **Lead Engineer:** Hovan Hodges (Core Systems Engineer)
   * **Resources Required:** GNAT 2022 compiler; [`src/beacon-topic.ads`](../src/beacon-topic.ads) and [`src/beacon-topic.adb`](../src/beacon-topic.adb); [`tests/src/topic_tests.adb`](../tests/src/topic_tests.adb); Visual Studio Code.
+  * **Status:** Complete (11/16/2026). `Is_Locked`, `Delete_Subscriber` and the registry lock are in [`src/beacon-topic.ads`](../src/beacon-topic.ads).
   * **Time Needed:** 12 hours | **Duration:** 1 week (Nov 16 – Nov 22, 2026).
   * **Costs Associated:** \$0.
   * **Predecessors & Successors:**

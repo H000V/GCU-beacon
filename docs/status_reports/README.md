@@ -26,7 +26,7 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **Initial Research & Design** | 10/04/2026 | **Completed** | Seed codebase audited, toolchains verified. |
 | **First Meeting with AdaCore Mentor** | 10/14/2026 | **Completed** | Consultation with Olivier Henley (UX & GAP Coordinator). |
 | **Design Review Presentation 1 (Milestone 1)** | 10/22/2026 | **Completed** | Delivered formal 15-minute presentation and trade study defense. |
-| **In-Process Backend Demo (Milestone 2)** | 11/22/2026 | **In Progress** | Scheduled for Sprint Phase 3 completion (`v0.1.0-inproc`). |
+| **In-Process Backend Demo (Milestone 2)** | 11/22/2026 | **In Progress** | Release `v0.1.0-inproc` tagged 11/18/2026 (Task 3.6); live demo still to come. |
 
 ---
 
