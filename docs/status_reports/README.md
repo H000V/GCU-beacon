@@ -16,6 +16,7 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **SR-05** | **Week 8** | 11/01/2026 | **10%** | Implementation of timed `Receive` with its first unit tests (Task 2.1; Task 2.2 still in progress at report time), closure of Open Design Decision 3, and planning of protected entry barrier hardening for Phase 2 completion. | [`STATUS_REPORT_05_NOV_01.md`](STATUS_REPORT_05_NOV_01.md) |
 | **SR-06** | **Week 9** | 11/08/2026 | **13%** | Hardening protected queue barriers with CPP (Task 2.3), formal inductive proof and Ada Type_Invariant verification for Best-Effort ring buffer drop-oldest arithmetic (Task 3.1), then a full GNATprove proof of `Beacon.Queue` (71/71 checks). | [`STATUS_REPORT_06_NOV_08.md`](STATUS_REPORT_06_NOV_08.md) |
 | **SR-07** | **Week 10** | 11/15/2026 | **19%** | Jorvik profile and zero-heap compliance of the core (Task 3.4), multi-task blocking-publish test closing Phase 2 (Task 2.4), drop-oldest property tests (Task 3.2), and the 11/6 code review follow-up plan (Tasks 3.7 and 4.2b added). | [`STATUS_REPORT_07_NOV_15.md`](STATUS_REPORT_07_NOV_15.md) |
+| **SR-08** | **Week 11** | 11/22/2026 | **28%** | Subscriber lifecycle and registry lockdown (Task 3.7), flight telemetry demo (Task 3.5), soak test completion (Task 3.3), and the `v0.1.0-inproc` release tagged after a green CI run (Task 3.6). Milestone 2 forecast for 11/20. | [`STATUS_REPORT_08_NOV_22.md`](STATUS_REPORT_08_NOV_22.md) |
 
 ---
 
@@ -26,7 +27,7 @@ This directory catalogs the weekly progress updates and status reports submitted
 | **Initial Research & Design** | 10/04/2026 | **Completed** | Seed codebase audited, toolchains verified. |
 | **First Meeting with AdaCore Mentor** | 10/14/2026 | **Completed** | Consultation with Olivier Henley (UX & GAP Coordinator). |
 | **Design Review Presentation 1 (Milestone 1)** | 10/22/2026 | **Completed** | Delivered formal 15-minute presentation and trade study defense. |
-| **In-Process Backend Demo (Milestone 2)** | 11/22/2026 | **In Progress** | Release `v0.1.0-inproc` tagged 11/18/2026 (Task 3.6); live demo still to come. |
+| **In-Process Backend Demo (Milestone 2)** | 11/22/2026 | **In Progress** | Release `v0.1.0-inproc` tagged 11/18/2026 (Task 3.6); live demo forecast for 11/20/2026. |
 
 ---
 
@@ -39,14 +40,14 @@ This directory catalogs the weekly progress updates and status reports submitted
 | Ada 2022 & SPARK Language Learning     Week 4 (1%)    Monitored        Ongoing study of Ada RM  |
 | Curve & Verification Complexity                                        and AdaCore tutorials.   |
 |-------------------------------------------------------------------------------------------------|
-| Open Design Ambiguities (Receive       Week 5 (3%)    Partially        Mentor consultations on  |
-| timeouts, registry lockdown, try-pub)                 Resolved         10/14 & 10/15 set the    |
-|                                                                        direction. Timed Receive |
-|                                                                        is implemented; registry |
-|                                                                        lockdown, configurable   |
-|                                                                        Try_Publish and dangling |
-|                                                                        subscriber access remain |
-|                                                                        open in code.            |
+| Open Design Ambiguities (Receive       Week 5 (3%)    Resolved         Timed Receive done in    |
+| timeouts, registry lockdown, try-pub)                 (Week 11)        Week 8. Registry         |
+|                                                                        lockdown and             |
+|                                                                        Delete_Subscriber done   |
+|                                                                        in Task 3.7 (11/16).     |
+|                                                                        Configurable Try_Publish |
+|                                                                        (FR-08) deferred to      |
+|                                                                        Spring 2027.             |
 |-------------------------------------------------------------------------------------------------|
 | Team Member Withdrawal & Roster        Week 7 (7%)    Resolved         Team consolidated into   |
 | Transition                                                             3-member structure; Ryan |
@@ -65,17 +66,24 @@ This directory catalogs the weekly progress updates and status reports submitted
 | Protected Barrier Concurrency                                          in gnat.adc and priority |
 |                                                                        aspects on queues.       |
 |-------------------------------------------------------------------------------------------------|
-| High-Frequency Soak Stress &           Week 9 (13%)   Measured         Task 3.3 soak passes;    |
-| Task Scheduling Jitter (Task 3.3)                     (Week 10)        Dropped(Reliable) = 0.   |
+| High-Frequency Soak Stress &           Week 9 (13%)   Mitigated        Task 3.3 soak (11/15)    |
+| Task Scheduling Jitter (Task 3.3)                     (Week 11)        runs in CI;              |
+|                                                                        Dropped(Reliable) = 0.   |
 |                                                                        Windows timer tick (16   |
 |                                                                        ms) dominates desktop    |
 |                                                                        timing: use Linux CI.    |
 |                                                                        See Task 3.3 report.     |
 |-------------------------------------------------------------------------------------------------|
-| Code Review Follow-Up Compressing      Week 10 (16%)  Active           Follow-ups applied 11/6; |
-| Week 11 Before Milestone 2                                             FR-08 deferred to Spring |
-|                                                                        2027; Tasks 2.4 and 3.4  |
-|                                                                        closed 11/12.            |
+| Code Review Follow-Up Compressing      Week 10 (16%)  Resolved         Tasks 3.5 and 3.7 closed |
+| Week 11 Before Milestone 2                            (Week 11)        11/16 and Task 3.6 on    |
+|                                                                        11/18, ahead of the      |
+|                                                                        11/22 plan.              |
+|-------------------------------------------------------------------------------------------------|
+| Thanksgiving Week Holding Three        Week 11 (28%)  Active           Task 4.2b moved from     |
+| Phase 4 Tasks (4.1, 4.2, 4.2b)                                         Ryan to Hovan: one Week  |
+|                                                                        12 task per engineer.    |
+|                                                                        Tasks 4.2 and 4.2b       |
+|                                                                        depend on Task 4.1.      |
 +-------------------------------------------------------------------------------------------------+
 ```
 
